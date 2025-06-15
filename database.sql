@@ -62,7 +62,7 @@ CREATE TABLE `benutzer` (
 --
 
 INSERT INTO `benutzer` (`name`, `id`, `password`, `berechtigung`, `mail`, `benutzername`, `shs`) VALUES
-('Kilian Schneider', 3, '$2a$10$1D1gl4FUaorpO9gYRrBSkuJFhLsyK4IKiM3MMp5vBXflRbahSTy4G', '0,', 'monsieurk1209@gmail.com', 'KlnSdr', NULL);
+('test', 3, '$2a$10$UFc55zB7an5s8x1Oabq3YeIVcj2z.e0KwQszbTaIVEAIEv4FyWfJ.', '0,', 'test@test.test', 'test', NULL);
 
 -- --------------------------------------------------------
 
