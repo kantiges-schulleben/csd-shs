@@ -1,0 +1,9 @@
+.env
+.env_sample
+.git
+.gitignore
+.prettierrc
+Dockerfile
+docker-compose.yml
+gemo.py
+node_modules

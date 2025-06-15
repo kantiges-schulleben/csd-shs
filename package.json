@@ -10,14 +10,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh://git@github.com/KlnSdr/website.git"
+        "url": "git+ssh://git@github.com/kantiges-schulleben/csd-shs.git"
     },
     "author": "KlnSdr",
     "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/KlnSdr/website/issues"
-    },
-    "homepage": "https://github.com/KlnSdr/website#readme",
+    "homepage": "https://github.com/kantiges-schulleben/csd-shs#readme",
     "dependencies": {
         "@types/bcryptjs": "^2.4.2",
         "@types/express": "^4.17.13",

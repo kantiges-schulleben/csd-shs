@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "${PORT}:${PORT}"  # App is accessible from outside
+    env_file:
+      - .env
+    volumes:
+      - .env:/app/.env  # Mount .env into container
+    networks:
+      - shsinternal
+
+  db:
+    image: mariadb:11
+    env_file:
+      - .env
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql:ro
+    networks:
+      - shsinternal
+    # No "ports" entry → not exposed to host machine
+
+volumes:
+  mariadb_data:
+
+networks:
+  shsinternal:
+    driver: bridge
+

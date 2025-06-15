@@ -38,6 +38,11 @@ function startup() {
                                     },
                                 ],
                             },
+                            {
+                              tag: "p",
+                              id: "output"
+                            },
+                            // @ts-ignore
                             ...markupUser(),
                         ],
                     },
@@ -66,13 +71,11 @@ function startScript() {
     if (confirm('Auswertung starten?')) {
         (document.getElementById('output') as HTMLParagraphElement).innerText =
             'auswertung gestartet...';
-        $.get('/shs/admin/start', function (data: string) {
-            if (data == '') {
-                alert('Es ist ein Fehler aufgetreten.');
+        $.get('/shs/admin/start', function (data: {[key: string]: any}) {
+            if (!data["success"]) {
+              (document.getElementById('output') as HTMLParagraphElement).innerText = "Es ist ein Fehler bei der Auswertung aufgetreten";
             } else {
-                (
-                    document.getElementById('output') as HTMLParagraphElement
-                ).innerText = data;
+              (document.getElementById('output') as HTMLParagraphElement).innerText = "Auswertung erfolreich abgeschlossen";
             }
         });
     }

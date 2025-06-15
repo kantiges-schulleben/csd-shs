@@ -4,7 +4,6 @@ import { use } from '../moduleManager';
 import * as path from 'path';
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 import { emailText } from './emailText';
-import { sendMail } from '../mail';
 import { encode } from 'html-entities';
 
 let modulesPath: string = '';
@@ -86,6 +85,10 @@ export function config(
                     )
                     .then(() => {
                         res.json({ success: true });
+                    })
+                    .catch((err: any) => {
+                      console.error(err);
+                      res.json({success: false});
                     });
             } else {
                 res.redirect('/login');
@@ -350,22 +353,24 @@ function sendMailsToStudents(sortedStudentData: types.obj): Promise<boolean> {
                     paar['klasse'],
                     'lehrer',
                 ]);
-                sendMail(
+                use("mail", (mail: types.obj) => {
+                  mail.sendMail(
                     'Schüler*innen helfen Schüler*innen',
                     {
-                        name: paar['name'],
-                        mail: paar['mail'],
+                      name: paar['name'],
+                      mail: paar['mail'],
                     },
                     { name: 'ShS-Team', mail: 'shs@kantgym-leipzig.de' },
                     'Rückmeldung Partner*in',
                     emailText.get('einzel', 'lehrer', {
-                        name: paar['name'],
-                        namePartner: paar['partner']['name'],
-                        fach: paar['facher'],
-                        mailPartner: `<a href='mailto:${paar['partner']['mail']}'>${paar['partner']['mail']}</a>`,
-                        telefonPartner: paar['partner']['telefon'],
+                      name: paar['name'],
+                      namePartner: paar['partner']['name'],
+                      fach: paar['facher'],
+                      mailPartner: `<a href='mailto:${paar['partner']['mail']}'>${paar['partner']['mail']}</a>`,
+                      telefonPartner: paar['partner']['telefon'],
                     })
-                );
+                  );
+                });
 
                 queries.push(
                     'INSERT INTO handschlag (fach, id, partner, klasse, typ) VALUES (?, ?, ?, ?, ?)'
@@ -378,22 +383,24 @@ function sendMailsToStudents(sortedStudentData: types.obj): Promise<boolean> {
                     'schueler',
                 ]);
 
-                sendMail(
+                use("mail", (mail: types.obj) => {
+                  mail.sendMail(
                     'Schüler*innen helfen Schüler*innen',
                     {
-                        name: paar['partner']['name'],
-                        mail: paar['partner']['mail'],
+                      name: paar['partner']['name'],
+                      mail: paar['partner']['mail'],
                     },
                     { name: 'ShS-Team', mail: 'shs@kantgym-leipzig.de' },
                     'Rückmeldung Partner*in',
                     emailText.get('einzel', 'schueler', {
-                        name: paar['partner']['name'],
-                        partner: paar['name'],
-                        fach: paar['facher'],
-                        mailPartner: `<a href='mailto:${paar['mail']}'>${paar['mail']}</a>`,
-                        telefonPartner: paar['telefon'],
+                      name: paar['partner']['name'],
+                      partner: paar['name'],
+                      fach: paar['facher'],
+                      mailPartner: `<a href='mailto:${paar['mail']}'>${paar['mail']}</a>`,
+                      telefonPartner: paar['telefon'],
                     })
-                );
+                  );
+                });
             });
 
             sortedStudentData['gruppe'].forEach((paar: types.obj) => {
@@ -412,34 +419,36 @@ function sendMailsToStudents(sortedStudentData: types.obj): Promise<boolean> {
                     'lehrer',
                 ]);
 
-                sendMail(
+                use("mail", (mail: types.obj) => {
+                  mail.sendMail(
                     'Schüler*innen helfen Schüler*innen',
                     {
-                        name: paar['name'],
-                        mail: paar['mail'],
+                      name: paar['name'],
+                      mail: paar['mail'],
                     },
                     { name: 'ShS-Team', mail: 'shs@kantgym-leipzig.de' },
                     'Rückmeldung Partner*in',
                     emailText.get('gruppe', 'lehrer', {
-                        name: paar['name'],
-                        fach: paar['facher'],
-                        gruppenPartner: Object.keys(paar['partner'])
-                            .map((partnerIndex: string) => {
-                                return paar['partner'][partnerIndex]['name'];
-                            })
-                            .join(', '),
-                        mailsStudents: Object.keys(paar['partner'])
-                            .map((partnerIndex: string) => {
-                                return `<a href="mailto:${paar['partner'][partnerIndex]['mail']}">${paar['partner'][partnerIndex]['mail']}</a>`;
-                            })
-                            .join(', '),
-                        telefonStudents: Object.keys(paar['partner'])
-                            .map((partnerIndex: string) => {
-                                return paar['partner'][partnerIndex]['telefon'];
-                            })
-                            .join(', '),
+                      name: paar['name'],
+                      fach: paar['facher'],
+                      gruppenPartner: Object.keys(paar['partner'])
+                      .map((partnerIndex: string) => {
+                        return paar['partner'][partnerIndex]['name'];
+                      })
+                      .join(', '),
+                      mailsStudents: Object.keys(paar['partner'])
+                      .map((partnerIndex: string) => {
+                        return `<a href="mailto:${paar['partner'][partnerIndex]['mail']}">${paar['partner'][partnerIndex]['mail']}</a>`;
+                      })
+                      .join(', '),
+                      telefonStudents: Object.keys(paar['partner'])
+                      .map((partnerIndex: string) => {
+                        return paar['partner'][partnerIndex]['telefon'];
+                      })
+                      .join(', '),
                     })
-                );
+                  );
+                });
 
                 Object.keys(paar['partner']).forEach((partnerIndex: string) => {
                     queries.push(
@@ -453,38 +462,42 @@ function sendMailsToStudents(sortedStudentData: types.obj): Promise<boolean> {
                         'schueler',
                     ]);
 
-                    sendMail(
+                    use("mail", (mail: types.obj) => {
+                      mail.sendMail(
                         'Schüler*innen helfen Schüler*innen',
                         {
-                            name: paar['partner'][partnerIndex]['name'],
-                            mail: paar['partner'][partnerIndex]['mail'],
+                          name: paar['partner'][partnerIndex]['name'],
+                          mail: paar['partner'][partnerIndex]['mail'],
                         },
                         { name: 'ShS-Team', mail: 'shs@kantgym-leipzig.de' },
                         'Rückmeldung Partner*in',
                         emailText.get('gruppe', 'schueler', {
-                            name: paar['partner'][partnerIndex]['name'],
-                            nameTeacher: paar['name'],
-                            fach: paar['facher'],
-                            mailTeacher: paar['mail'],
-                            telefonTeacher: paar['telefon'],
+                          name: paar['partner'][partnerIndex]['name'],
+                          nameTeacher: paar['name'],
+                          fach: paar['facher'],
+                          mailTeacher: paar['mail'],
+                          telefonTeacher: paar['telefon'],
                         })
-                    );
+                      );
+                    });
                 });
             });
 
             sortedStudentData['ohne'].forEach((looser: types.obj) => {
-                sendMail(
-                    'Schüler*innen helfen Schüler*innen',
-                    {
-                        name: looser['name'],
-                        mail: looser['mail'],
-                    },
-                    { name: 'ShS-Team', mail: 'shs@kantgym-leipzig.de' },
-                    'Rückmeldung Partner*in',
-                    emailText.get('ohne', 'ohne', {
-                        name: looser['name'],
-                    })
+              use("mail", (mail: types.obj) => {
+                mail.sendMail(
+                  'Schüler*innen helfen Schüler*innen',
+                  {
+                    name: looser['name'],
+                    mail: looser['mail'],
+                  },
+                  { name: 'ShS-Team', mail: 'shs@kantgym-leipzig.de' },
+                  'Rückmeldung Partner*in',
+                  emailText.get('ohne', 'ohne', {
+                    name: looser['name'],
+                  })
                 );
+              });
             });
 
             doBatchQueryStudents(queries, queryData, 0, database);
