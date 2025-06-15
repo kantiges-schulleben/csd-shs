@@ -4,11 +4,11 @@ services:
   app:
     build: .
     ports:
-      - "${PORT}:${PORT}"  # App is accessible from outside
+      - "${PORT}:${PORT}"
     env_file:
       - .env
     volumes:
-      - .env:/app/.env  # Mount .env into container
+      - .env:/app/.env
     networks:
       - shsinternal
 
@@ -21,7 +21,6 @@ services:
       - ./database.sql:/docker-entrypoint-initdb.d/database.sql:ro
     networks:
       - shsinternal
-    # No "ports" entry → not exposed to host machine
 
 volumes:
   mariadb_data:
