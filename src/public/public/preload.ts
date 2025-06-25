@@ -32,55 +32,11 @@ function preload() {
                     ${/*TODO css zentralisieren & style hier entfernen*/ ''}
                     <div class='menu-bar'>
                         <ul class='nav-links'>
-                            <li class='active'><a href='/'>Home</a>
+                            <li class='active'><a href='/'>Startseite</a>
                             </li>
-                            <li>
-                                <a href='/shs/blog'>ShS</a>
-                                <div class='sub-menu-1'>
-                                    <ul>
-                                        <li><a href='/shs/information'>Informationen</a></li>
-                                        <li><a href='/shs/blog'>Aktuelles</a></li>
-                                        <!--##-->
-                                        <li><a href='/shs/anmeldung'>Anmeldung</a></li>
-                                        <li><a href='/shs/team'>Team</a></li>
-                                        <li><a href='/shs/sessions'>Whiteboard</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li><a href='/kantrat/aktuelles'>Kantrat</a>
-                                <!--##-->
-                                <div class='sub-menu-1'>
-                                    <ul>
-                                        <li><a href='/kantrat/aktuelles'>Aktuelles</a></li>
-                                        <li><a href='/kantrat/allgemein'>Allgemein</a></li>
-                                        <li><a href='/kantrat/vorstand'>Vorstand</a></li>
-                                        <li><a href='/kantrat/arbeitsgruppen'>Arbeitsgruppen</a></li>
-                                        <li><a href='/kantrat/kontakt'>Kontakt</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li>
-                                <a href='/provokant/aktuelles'>Provokant</a>
-                                <div class='sub-menu-1'>
-                                    <ul>
-                                        <li><a href='/provokant/vorstellung'>Vorstellung</a></li>
-                                        <li><a href='/provokant/aktuelles'>Aktuelles</a></li>
-                                        <li><a href='/provokant/lokales'>Lokales</a></li>
-                                        <li><a href='/provokant/internationales'>Internationales</a></li>
-                                        <li><a href='/provokant/empfehlungen'>Empfehlungen</a></li>
-                                        <li><a href='/provokant/tipps'>Tipps & Tricks</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li>
-                                <a href='/error'>Projekte</a>
-                                <div class='sub-menu-1'>
-                                    <ul>
-                                        <li><a href='/error'>Schulband</a></li>
-                                        <li><a href='/error'>Schulclub</a></li>
-                                    </ul>
-                                </div>
-                            </li>
+                            <li><a href='/shs/information'>Informationen</a></li>
+                            <li><a href='/shs/blog'>Aktuelles</a></li>
+                            <li><a href='/shs/anmeldung'>Anmeldung</a></li>
                             <li id="liLnkKonto">
                                 <a id="lnkKonto">Konto</a>
                                 <div class='sub-menu-1'>
