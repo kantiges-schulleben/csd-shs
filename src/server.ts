@@ -36,7 +36,7 @@ app.set('view engine', 'handlebars');
 const directoryPath: string = path.join(__dirname, 'modules');
 let moduleBlacklist: string[] = ['tmp'];
 
-const moduleSettings: obj = JSON.parse(
+const moduleSettings: types.obj = JSON.parse(
     fs.readFileSync('./src/config.json').toString()
 );
 

@@ -1,9 +1,5 @@
 export {};
 
-interface obj {
-    [key: string]: any;
-}
-
 function preload() {
     // set title dynamically for all pages
     document.title = 'kantiges Schulleben';
