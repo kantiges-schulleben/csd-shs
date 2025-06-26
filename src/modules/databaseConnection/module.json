@@ -1,8 +1,0 @@
-{
-    "name": "databaseConnection",
-    "description": "",
-    "authors": ["KlnSdr"],
-    "version": "0.0.1",
-    "routes": [],
-    "files": ["index"]
-}
