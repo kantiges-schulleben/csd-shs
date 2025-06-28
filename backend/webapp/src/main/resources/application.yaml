@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: webapp
+#  security:
+#    oauth2:
+#      client:
+#        registration:
+#          gitlab:
+#            client-id:
+#            client-secret:
+#            redirect-uri:
+#            authorization-grant-type: authorization_code
+#            scope: read_user
+#        provider:
+#          gitlab:
+#            authorization-uri:
+#            token-uri:
+#            user-info-uri:
+#            user-name-attribute: id
+server:
+  port: 8080
+#app:
+#  oauth2:
+#    successRedirectUrl:
+#    failRedirectUrl:
+#  frontend:
+#    url:
+#  auth:
+#    jwt:
+#      secret:
+#      expiration: 10800000 # 3 hours
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /v1/api-docs/swagger-ui.html
+    operationsSorter: method
