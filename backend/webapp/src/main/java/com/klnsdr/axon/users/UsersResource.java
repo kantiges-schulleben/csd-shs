@@ -4,7 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/users") public class UsersResource { @GetMapping("/search")
+@RequestMapping("/api/users") public class UsersResource {
+    @GetMapping("/search")
     public ResponseEntity<?> searchUsers() {
         return ResponseEntity.status(501).build();
     }
