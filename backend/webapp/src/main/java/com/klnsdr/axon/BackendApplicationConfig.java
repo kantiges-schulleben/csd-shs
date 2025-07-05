@@ -1,5 +1,7 @@
 package com.klnsdr.axon;
 
+import com.klnsdr.axon.auth.OAuthHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -15,11 +17,24 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @ComponentScan("com.klnsdr.axon")
 @EnableWebSecurity
 public class BackendApplicationConfig implements WebMvcConfigurer {
+    @Value("${app.oauth2.failRedirectUrl}")
+    private String oauthFailureRedirectUrl;
+
+    private final OAuthHandler oAuthHandler;
+
+    public BackendApplicationConfig(OAuthHandler oAuthHandler) {
+        this.oAuthHandler = oAuthHandler;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(authorize -> authorize
                     .anyRequest().permitAll()
+            )
+            .oauth2Login(oauth2 -> oauth2
+                    .successHandler(oAuthHandler)
+                    .failureUrl(oauthFailureRedirectUrl)
             )
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(sessionManagement -> sessionManagement
