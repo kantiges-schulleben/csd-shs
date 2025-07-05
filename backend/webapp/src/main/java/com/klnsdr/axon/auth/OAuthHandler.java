@@ -1,7 +1,11 @@
 package com.klnsdr.axon.auth;
 
+import com.klnsdr.axon.user.entity.UserEntity;
+import com.klnsdr.axon.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -10,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Handler for successful OAuth2 authentication.
@@ -18,7 +24,9 @@ import java.util.Date;
  */
 @Component
 public class OAuthHandler implements AuthenticationSuccessHandler {
+    private final Logger logger = LoggerFactory.getLogger(OAuthHandler.class);
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     /**
      * The URL to redirect to after successful authentication.
@@ -26,8 +34,9 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
     @Value("${app.oauth2.successRedirectUrl}")
     private String redirectUrl;
 
-    public OAuthHandler(JwtUtil jwtUtil) {
+    public OAuthHandler(JwtUtil jwtUtil, UserService userService) {
         this.jwtUtil = jwtUtil;
+        this.userService = userService;
     }
 
     /**
@@ -44,14 +53,28 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
         try {
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-            final String token = jwtUtil.generateToken(oAuth2User);
+            if (oAuth2User == null) {
+                response.sendRedirect("/login?error=true");
+                return;
+            }
+            final String idpID = Objects.requireNonNull(oAuth2User.getAttribute("id")).toString();
+
+            final Optional<UserEntity> userOptional = userService.findByIdpID(idpID);
+            UserEntity user;
+            if (userOptional.isPresent()) {
+                user = userOptional.get();
+            } else {
+                logger.debug("Creating new user with IDP ID: {}", idpID);
+                final String name = oAuth2User.getAttribute("login");
+                user = userService.createUser(idpID, name);
+            }
+
+            final String token = jwtUtil.generateToken(oAuth2User, user);
             final Date validTill = jwtUtil.extractExpiration(token);
-
-            System.out.println(token);
-
             // Redirect to the desired URL after login
             response.sendRedirect(redirectUrl + "?token=" + token);
         } catch (Exception e) {
+            logger.error("Error during OAuth2 authentication success handling", e);
             response.sendRedirect("/login?error=true");
         }
     }
