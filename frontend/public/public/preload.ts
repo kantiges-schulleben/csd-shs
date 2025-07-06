@@ -120,7 +120,13 @@ function preload() {
           li.appendChild(link);
 
           document.getElementById('submenuDynamicLinks')!.appendChild(li);
+
         });
+        const jwtUserNameClaim: string | null = getJwtClaim("username");
+        if (jwtUserNameClaim !== null) {
+          document.getElementById('lnkKonto')!.textContent = jwtUserNameClaim;
+          document.getElementById('liLnkKonto')!.classList.add('isLoggedIn');
+        }
     })
     .catch((e: any) => {
       console.error(e);
