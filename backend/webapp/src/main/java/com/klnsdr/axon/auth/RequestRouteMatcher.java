@@ -11,6 +11,10 @@ public class RequestRouteMatcher {
     private final List<String> postRoutes;
     private final List<String> putRoutes;
     private final List<String> deleteRoutes;
+    private final List<String> getRoutesOptional;
+    private final List<String> postRoutesOptional;
+    private final List<String> putRoutesOptional;
+    private final List<String> deleteRoutesOptional;
 
     /**
      * Constructs a new RequestRouteMatcher with the specified routes for each HTTP method.
@@ -20,11 +24,24 @@ public class RequestRouteMatcher {
      * @param putRoutes the list of PUT routes
      * @param deleteRoutes the list of DELETE routes
      */
-    public RequestRouteMatcher(List<String> getRoutes, List<String> postRoutes, List<String> putRoutes, List<String> deleteRoutes) {
+    public RequestRouteMatcher(
+            List<String> getRoutes,
+            List<String> postRoutes,
+            List<String> putRoutes,
+            List<String> deleteRoutes,
+            List<String> getRoutesOptional,
+            List<String> postRoutesOptional,
+            List<String> putRoutesOptional,
+            List<String> deleteRoutesOptional
+    ) {
         this.getRoutes = getRoutes;
         this.postRoutes = postRoutes;
         this.putRoutes = putRoutes;
         this.deleteRoutes = deleteRoutes;
+        this.getRoutesOptional = getRoutesOptional;
+        this.postRoutesOptional = postRoutesOptional;
+        this.putRoutesOptional = putRoutesOptional;
+        this.deleteRoutesOptional = deleteRoutesOptional;
     }
 
     /**
@@ -40,6 +57,16 @@ public class RequestRouteMatcher {
             case "POST" -> postRoutes.stream().anyMatch(path::matches);
             case "PUT" -> putRoutes.stream().anyMatch(path::matches);
             case "DELETE" -> deleteRoutes.stream().anyMatch(path::matches);
+            default -> false;
+        };
+    }
+
+    public boolean isRestrictedRouteOptional(String path, String method) {
+        return switch (method.toUpperCase()) {
+            case "GET" -> getRoutesOptional.stream().anyMatch(path::matches);
+            case "POST" -> postRoutesOptional.stream().anyMatch(path::matches);
+            case "PUT" -> putRoutesOptional.stream().anyMatch(path::matches);
+            case "DELETE" -> deleteRoutesOptional.stream().anyMatch(path::matches);
             default -> false;
         };
     }
@@ -62,6 +89,10 @@ public class RequestRouteMatcher {
         private final List<String> postRoutes = new ArrayList<>();
         private final List<String> putRoutes = new ArrayList<>();
         private final List<String> deleteRoutes = new ArrayList<>();
+        private final List<String> getRoutesOptional = new ArrayList<>();
+        private final List<String> postRoutesOptional = new ArrayList<>();
+        private final List<String> putRoutesOptional = new ArrayList<>();
+        private final List<String> deleteRoutesOptional = new ArrayList<>();
 
         /**
          * Adds a GET route to the builder.
@@ -71,6 +102,12 @@ public class RequestRouteMatcher {
          */
         public RestrictedRoutesBuilder get(String path) {
             getRoutes.add(path);
+            return this;
+        }
+
+        public RestrictedRoutesBuilder getWantsInfo(String path) {
+            getRoutesOptional.add(path);
+            get(path);
             return this;
         }
 
@@ -85,6 +122,12 @@ public class RequestRouteMatcher {
             return this;
         }
 
+        public RestrictedRoutesBuilder postWantsInfo(String path) {
+            postRoutesOptional.add(path);
+            post(path);
+            return this;
+        }
+
         /**
          * Adds a PUT route to the builder.
          *
@@ -93,6 +136,12 @@ public class RequestRouteMatcher {
          */
         public RestrictedRoutesBuilder put(String path) {
             putRoutes.add(path);
+            return this;
+        }
+
+        public RestrictedRoutesBuilder putWantsInfo(String path) {
+            putRoutesOptional.add(path);
+            put(path);
             return this;
         }
 
@@ -107,6 +156,12 @@ public class RequestRouteMatcher {
             return this;
         }
 
+        public RestrictedRoutesBuilder deleteWantsInfo(String path) {
+            deleteRoutesOptional.add(path);
+            delete(path);
+            return this;
+        }
+
         /**
          * Builds and returns a RequestRouteMatcher with the specified routes.
          *
@@ -117,7 +172,20 @@ public class RequestRouteMatcher {
             postRoutes.replaceAll(route -> route.replace("*", PATTERN_STAR));
             putRoutes.replaceAll(route -> route.replace("*", PATTERN_STAR));
             deleteRoutes.replaceAll(route -> route.replace("*", PATTERN_STAR));
-            return new RequestRouteMatcher(getRoutes, postRoutes, putRoutes, deleteRoutes);
+            getRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
+            postRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
+            putRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
+            deleteRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
+            return new RequestRouteMatcher(
+                    getRoutes,
+                    postRoutes,
+                    putRoutes,
+                    deleteRoutes,
+                    getRoutesOptional,
+                    postRoutesOptional,
+                    putRoutesOptional,
+                    deleteRoutesOptional
+            );
         }
     }
 }

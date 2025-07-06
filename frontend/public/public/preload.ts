@@ -1,6 +1,11 @@
 export {};
+interface menuItem {
+  name: string;
+  location: string;
+};
 
 function preload() {
+  tokenPresent();
     // set title dynamically for all pages
     document.title = 'kantiges Schulleben';
 
@@ -85,18 +90,54 @@ function preload() {
     link.rel = 'icon';
     link.href = '/public/favicon.svg';
     document.getElementsByTagName('head')[0].appendChild(link);
+    const backend: string = "http://localhost:8080";
 
-    $.get('/kontoSubMenuInfo', (data: obj) => {
-        data.links.forEach((link: string) => {
-            document.getElementById('submenuDynamicLinks')!.innerHTML += link;
+    fetch(`${backend}/api/users/menu`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+      }
+    })
+    .then((response: Response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+      }
+      return response.json();
+    })
+    .then((data: menuItem[]) => {
+        data.forEach((item: menuItem) => {
+          const li: HTMLLIElement = document.createElement("li");
+          const link: HTMLAnchorElement = document.createElement("a");
+          link.textContent = item.name;
+          link.href = backend + item.location;
+          if (item.location === "/api/users/logout") {
+            link.addEventListener("click", (e: Event) => {
+              e.preventDefault();
+              localStorage.removeItem("csd_token");
+              location.assign(`${backend}${item.location}`);
+            });
+          }
+
+          li.appendChild(link);
+
+          document.getElementById('submenuDynamicLinks')!.appendChild(li);
         });
-
-        document.getElementById('lnkKonto')!.innerText = data.username;
-
-        if (data.username !== 'Konto') {
-            document.getElementById('liLnkKonto')!.classList.add('isLoggedIn');
-        }
+    })
+    .catch((e: any) => {
+      console.error(e);
+      const errorLabel: HTMLLabelElement = document.createElement("label");
+      errorLabel.innerText = "Fehler beim Laden des Menüs";
+      document.getElementById('submenuDynamicLinks')!.appendChild(errorLabel);
     });
 
     navSlide();
+}
+
+function tokenPresent() {
+  const params = new URLSearchParams(document.location.search);
+  const token = params.get("token");
+
+  if (token !== null) {
+    localStorage.setItem("csd_token", token);
+    location.assign("/");
+  }
 }

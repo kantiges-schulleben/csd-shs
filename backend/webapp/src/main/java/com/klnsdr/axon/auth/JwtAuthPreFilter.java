@@ -53,13 +53,6 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String path = request.getRequestURI();
         final String method = request.getMethod();
-        final boolean authRequired = requestRouteMatcher.isRestrictedRoute(path, method);
-
-        if (!authRequired) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -70,6 +63,17 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
 
         final String token = authHeader.substring(7);
 
+        if (requestRouteMatcher.isRestrictedRouteOptional(path, method)) {
+            handleWantsAuthentication(token, request, response, filterChain);
+            return;
+        } else if (requestRouteMatcher.isRestrictedRoute(path, method)) {
+            handleNeedsAuthentication(token, request, response, filterChain);
+            return;
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    private void handleNeedsAuthentication(String token, HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         if (!jwtUtil.isValidToken(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized");
@@ -97,6 +101,43 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
         if (!jwtUtil.validateToken(token, userDetails)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized");
+            return;
+        }
+
+        final UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+
+        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+
+        filterChain.doFilter(request, response);
+    }
+
+    private void handleWantsAuthentication(String token, HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        if (!jwtUtil.isValidToken(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (!tokenService.isKnownToken(token)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        final String username = jwtUtil.extractSubject(token);
+
+        if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        final UserDetails userDetails = User.builder()
+                .username(username)
+                .password("")
+                .build();
+
+        if (!jwtUtil.validateToken(token, userDetails)) {
+            filterChain.doFilter(request, response);
             return;
         }
 

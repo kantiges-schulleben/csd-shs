@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 public class RestrictedRoutesConfig {
     public RequestRouteMatcher getRestrictedRoutes() {
         return RequestRouteMatcher.builder()
+                .getWantsInfo("/api/users/menu")
                 .build();
     }
 }
