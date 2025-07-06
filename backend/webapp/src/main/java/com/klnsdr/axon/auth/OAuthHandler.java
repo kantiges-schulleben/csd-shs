@@ -1,5 +1,6 @@
 package com.klnsdr.axon.auth;
 
+import com.klnsdr.axon.auth.token.service.TokenService;
 import com.klnsdr.axon.user.entity.UserEntity;
 import com.klnsdr.axon.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
     private final Logger logger = LoggerFactory.getLogger(OAuthHandler.class);
     private final JwtUtil jwtUtil;
     private final UserService userService;
+    private final TokenService tokenService;
 
     /**
      * The URL to redirect to after successful authentication.
@@ -34,9 +36,10 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
     @Value("${app.oauth2.successRedirectUrl}")
     private String redirectUrl;
 
-    public OAuthHandler(JwtUtil jwtUtil, UserService userService) {
+    public OAuthHandler(JwtUtil jwtUtil, UserService userService, TokenService tokenService) {
         this.jwtUtil = jwtUtil;
         this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -71,7 +74,9 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
 
             final String token = jwtUtil.generateToken(oAuth2User, user);
             final Date validTill = jwtUtil.extractExpiration(token);
-            // Redirect to the desired URL after login
+
+            tokenService.save(token, validTill);
+
             response.sendRedirect(redirectUrl + "?token=" + token);
         } catch (Exception e) {
             logger.error("Error during OAuth2 authentication success handling", e);

@@ -1,7 +1,7 @@
 package com.klnsdr.axon.auth;
 
 import com.klnsdr.axon.RestrictedRoutesConfig;
-import com.klnsdr.axon.user.service.UserService;
+import com.klnsdr.axon.auth.token.service.TokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,19 +25,19 @@ import java.io.IOException;
 public class JwtAuthPreFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final RequestRouteMatcher requestRouteMatcher;
-    private final UserService userService;
+    private final TokenService tokenService;
 
     /**
      * Constructs a new JwtAuthPreFilter with the specified dependencies.
      *
      * @param jwtUtil the utility class for handling JWT operations
      * @param restrictedRoutesConfig the configuration for restricted routes
-     * @param userService the service for user-related operations
+     * @param tokenService the service for managing tokens
      */
-    public JwtAuthPreFilter(JwtUtil jwtUtil, RestrictedRoutesConfig restrictedRoutesConfig, UserService userService) {
+    public JwtAuthPreFilter(JwtUtil jwtUtil, RestrictedRoutesConfig restrictedRoutesConfig, TokenService tokenService) {
         this.jwtUtil = jwtUtil;
         this.requestRouteMatcher = restrictedRoutesConfig.getRestrictedRoutes();
-        this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     /**
@@ -76,7 +76,7 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (!userService.isKnownToken(token)) {
+        if (!tokenService.isKnownToken(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Unauthorized");
             return;

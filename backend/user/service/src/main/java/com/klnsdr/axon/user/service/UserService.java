@@ -23,8 +23,4 @@ public class UserService {
         user.setName(name);
         return userRepository.save(user);
     }
-
-    public boolean isKnownToken(String token) {
-        return true;
-    }
 }
