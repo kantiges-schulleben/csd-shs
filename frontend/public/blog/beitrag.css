@@ -20,7 +20,7 @@ a {
 
 .splash {
     height: 120vh;
-    background-image: url(../../assets/rat/background.png);
+    background-image: url(/assets/rat/background.png);
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
