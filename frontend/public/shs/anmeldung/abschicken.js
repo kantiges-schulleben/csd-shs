@@ -157,29 +157,7 @@ window.addEventListener('load', () => {
                 //alert("Einige der angegebenen Daten scheinen nicht zu stimmen");
                 console.log(warnungen);
             } else {
-                console.log('success');
-                $.post(
-                    '/shs/enroll',
-                    {
-                        name: vorname.value + ' ' + nachname1.value,
-                        klasse: klasse.innerText,
-                        mail: mail.value,
-                        telefon: handy.value,
-                        nachhilfe: nachhilfe,
-                        fach: fach.innerText,
-                        einzelnachhilfe: anzahl,
-                        ziel: klassenstufen.innerText,
-                    },
-                    (data) => {
-                        if (data.success == true) {
-                            window.location = './bestätigung.html';
-                        } else {
-                            alert(
-                                "Anscheinend hat etwas nicht geklappt. Bitte versuch's nochmal."
-                            );
-                        }
-                    }
-                );
+                doEnroll();
             }
         };
     };
@@ -365,29 +343,7 @@ window.addEventListener('load', () => {
                     //alert("Einige der angegebenen Daten scheinen nicht zu stimmen");
                     console.log(warnungen);
                 } else {
-                    console.log('success');
-                    $.post(
-                        '/shs/enroll',
-                        {
-                            name: vorname.value + ' ' + nachname1.value,
-                            klasse: klasse.innerText,
-                            mail: mail.value,
-                            telefon: handy.value,
-                            nachhilfe: nachhilfe,
-                            fach: fach.innerText,
-                            einzelnachhilfe: anzahl,
-                            ziel: klassenstufen.innerText,
-                        },
-                        (data) => {
-                            if (data.success == true) {
-                                window.location = './bestätigung.html';
-                            } else {
-                                alert(
-                                    "Anscheinend hat etwas nichtgeklappt. Bitte versuch's nochmal."
-                                );
-                            }
-                        }
-                    );
+                    doEnroll();
                 }
             };
         };
@@ -569,31 +525,81 @@ window.addEventListener('load', () => {
                     console.log(warnungen2);
                     //alert("Einige der angegebenen Daten scheinen nicht zu stimmen");
                 } else {
-                    console.log('success');
-                    $.post(
-                        '/shs/enroll',
-                        {
-                            name: vorname.value + ' ' + nachname.value,
-                            klasse: klasse.innerText,
-                            mail: mail.value,
-                            telefon: handy.value,
-                            nachhilfe: nachhilfe,
-                            fach: fach.innerText,
-                            einzelnachhilfe: anzahl,
-                            ziel: klassenstufen.innerText,
-                        },
-                        (data) => {
-                            if (data.success == true) {
-                                window.location = './bestätigung.html';
-                            } else {
-                                alert(
-                                    "Anscheinend hat etwas nicht geklappt. Bitte versuch's nochmal."
-                                );
-                            }
-                        }
-                    );
+                    doEnroll();
                 }
             };
         };
     });
 });
+
+function doEnroll() {
+    if (nachhilfe === 1) {
+        doEnrollTeacher();
+    } else {
+        doEnrollStudent();
+    }
+}
+
+const backend = "http://localhost:8080";
+function doEnrollStudent() {
+  const data = {
+      name: vorname.value,
+      surename: nachname.value, // FIXME gibt immer null zurück
+      mail: mail.value,
+      subject: fach.innerText,
+      grade: parseInt(klasse.innerText),
+      isGroup: anzahl == 0,
+      phoneNumber: handy.value
+    };
+  console.log(data);
+  fetch(`${backend}/api/shs/enroll/student`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    }
+    window.location.assign("/shs/anmeldung/bestätigung.html");
+  })
+  .catch(e => {
+    console.error(e);
+    alert("Bei der Anmeldung ist ein Fehler aufgetreten.");
+  });
+}
+
+function doEnrollTeacher() {
+  const data = {
+      name: vorname.value,
+      surename: nachname.value, // FIXME gibt immer null zurück
+      mail: mail.value,
+      subject: fach.innerText,
+      grade: parseInt(klasse.innerText),
+      isGroup: anzahl == 0,
+      phoneNumber: handy.value,
+      targetGrade : parseInt(klassenstufen.innerText)
+    };
+  console.log(data);
+  fetch(`${backend}/api/shs/enroll/teacher`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+    },
+    body: JSON.stringify(data)
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} ${response.statusText}`);
+    }
+    window.location.assign("/shs/anmeldung/bestätigung.html");
+  })
+  .catch(e => {
+    console.error(e);
+    alert("Bei der Anmeldung ist ein Fehler aufgetreten.");
+  });
+}

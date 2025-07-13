@@ -13,6 +13,7 @@
         <module>webapp</module>
         <module>user</module>
         <module>menu</module>
+        <module>shs</module>
     </modules>
 
     <dependencies>

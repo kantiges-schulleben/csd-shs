@@ -18,7 +18,7 @@ public class UserService {
     }
 
     public UserEntity createUser(String idpID, String name) {
-        UserEntity user = new UserEntity();
+        final UserEntity user = new UserEntity();
         user.setIdpID(idpID);
         user.setName(name);
         return userRepository.save(user);
