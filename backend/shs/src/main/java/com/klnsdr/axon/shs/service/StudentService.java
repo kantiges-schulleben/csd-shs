@@ -36,6 +36,22 @@ public class StudentService {
         return studentRepository.findByNameContainingIgnoreCase(query);
     }
 
+    public EnrolledStudentEntity update(Teacher teacher) {
+        if (teacher == null || teacher.getId() == null) {
+            throw new IllegalArgumentException("Teacher must not be null and must have an ID");
+        }
+
+        return studentRepository.save(map(teacher));
+    }
+
+    public EnrolledStudentEntity update(Student student) {
+        if (student == null || student.getId() == null) {
+            throw new IllegalArgumentException("Student must not be null and must have an ID");
+        }
+
+        return studentRepository.save(map(student));
+    }
+
     private EnrolledStudentEntity map(Teacher teacher) {
         final EnrolledStudentEntity entity = new EnrolledStudentEntity();
         entity.setId(teacher.getId());

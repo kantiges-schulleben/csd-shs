@@ -13,6 +13,7 @@ public class RestrictedRoutesConfig {
                 .getWantsInfo("/api/users/menu")
                 .getNeedsPermission("/api/shs/admin/students/count", WellKnownPermissions.SHS_ADMIN.getName())
                 .getNeedsPermission("/api/shs/admin/students/search", WellKnownPermissions.SHS_ADMIN.getName())
+                .getNeedsPermission("/api/shs/admin/students/id/*", WellKnownPermissions.SHS_ADMIN.getName())
                 .build();
     }
 }

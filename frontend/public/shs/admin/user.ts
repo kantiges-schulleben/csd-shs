@@ -506,7 +506,7 @@ function populateDetails(student: EnrolledStudent | obj) {
   edom.findById('bttnSave')?.addClick(
       'clickSave',
       (self: edomElement) => {
-          // saveDetails(userID);
+          saveDetails(student.id);
       }
   );
 
@@ -525,44 +525,52 @@ function saveDetails(userID: string) {
 
     const inputs: string[] = [
         'inputName',
-        'inputKlasse',
+        'inputSureName',
+        'inputGrade',
         'inputMail',
-        'inputTelefon',
+        'inputPhone',
+        'inputTarget',
     ];
-    const keys: string[] = ['name', 'klasse', 'mail', 'telefon'];
+    const keys: string[] = ['name', 'sureName', 'grade', 'mail', 'phoneNumber', 'targetGrade'];
+
 
     inputs.forEach((val: string, index: number) => {
         userdata[keys[index]] = (edom.findById(val) as edomInputElement).value;
     });
 
-    userdata['fach'] = (
-        edom.findById('selectFach')?.element as HTMLSelectElement
+    userdata['subject'] = (
+        edom.findById('selectSubject')?.element as HTMLSelectElement
     ).value;
 
-    userdata['einzelnachhilfe'] =
-        (edom.findById('selectArt')?.element as HTMLSelectElement).value ==
-        'Einzelnachhilfe'
-            ? '0'
-            : '1';
+    userdata['isGroup'] =
+        (edom.findById('selectIsGroup')?.element as HTMLSelectElement).value === 'Gruppennachhilfe';
 
-    userdata['nachhilfe'] =
-        (edom.findById('selectTyp')?.element as HTMLSelectElement).value ==
-        'Schüler*in'
-            ? '0'
-            : '1';
+    userdata['teacher'] =
+        (edom.findById('selectIsTeacher')?.element as HTMLSelectElement).value === 'Lehrer*in';
 
     edom.findById('bttnSave')?.applyStyle('fa', 'fa-spinner');
     edom.findById('bttnSave')?.setText('');
 
-    $.post(`/shs/admin/updateuser/${userID}`, userdata, (data: obj) => {
-        if (data.success) {
-            edom.findById('bttnSave')?.removeStyle('fa', 'fa-spinner');
-            edom.findById('bttnSave')?.setText('speichern');
-            clearDetails();
-            searchStudents();
-        } else {
-            edom.findById('bttnSave')?.swapStyle('fa-spinner', 'fa-times');
-        }
+    fetch(`${backend}/api/shs/admin/${userdata["teacher"] ? "teachers" : "students"}/id/${userID}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+      },
+      body: JSON.stringify(userdata)
+    })
+    .then((response: Response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+      }
+      edom.findById('bttnSave')?.removeStyle('fa', 'fa-spinner');
+      edom.findById('bttnSave')?.setText('speichern');
+      clearDetails();
+      searchStudents();
+    })
+    .catch((e: any) => {
+      console.error(e);
+      edom.findById('bttnSave')?.swapStyle('fa-spinner', 'fa-times');
     });
 }
 
@@ -590,9 +598,11 @@ function deleteUser(userID: string, name: string) {
 function clearDetails() {
     const inputs: string[] = [
         'inputName',
-        'inputKlasse',
+        'inputSureName',
+        'inputGrade',
         'inputMail',
-        'inputTelefon',
+        'inputPhone',
+        'inputTarget',
     ];
     edom.findById('outputID')?.setText('');
 
@@ -600,11 +610,11 @@ function clearDetails() {
         (edom.findById(val) as edomInputElement).setContent('');
     });
 
-    (edom.findById('selectFach')?.element as HTMLSelectElement).value = '';
+    (edom.findById('selectSubject')?.element as HTMLSelectElement).value = '';
 
-    (edom.findById('selectArt')?.element as HTMLSelectElement).value = '';
+    (edom.findById('selectIsGroup')?.element as HTMLSelectElement).value = '';
 
-    (edom.findById('selectTyp')?.element as HTMLSelectElement).value = '';
+    (edom.findById('selectIsTeacher')?.element as HTMLSelectElement).value = '';
     edom.findById('bttnSave')?.deleteClick('clickSave');
     edom.findById('bttnDelete')?.deleteClick('clickDelete');
 }

@@ -1,8 +1,11 @@
 package com.klnsdr.axon.shs.admin;
 
+import com.klnsdr.axon.shs.StudentDTO;
+import com.klnsdr.axon.shs.TeacherDTO;
 import com.klnsdr.axon.shs.entity.EnrolledStudentEntity;
+import com.klnsdr.axon.shs.entity.Student;
+import com.klnsdr.axon.shs.entity.Teacher;
 import com.klnsdr.axon.shs.service.StudentService;
-import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,14 +30,20 @@ public class ShsAdminResource {
         return studentService.searchByName(query);
     }
 
-    @GetMapping("/students/id/{studentId}")
-    public ResponseEntity<?> getStudentDetails() {
-        return ResponseEntity.status(501).build();
+    // TODO validate
+    @PutMapping("/students/id/{studentId}")
+    public EnrolledStudentEntity updateStudentDetails(@RequestBody StudentDTO studentEntity, @PathVariable("studentId") Long studentId) {
+        final Student student = StudentDTO.map(studentEntity);
+        student.setId(studentId);
+        return studentService.update(student);
     }
 
-    @PutMapping("/students/id/{studentId}")
-    public ResponseEntity<?> updateStudentDetails() {
-        return ResponseEntity.status(501).build();
+    // TODO validate
+    @PutMapping("/teachers/id/{teacherId}")
+    public EnrolledStudentEntity updateTeacherDetails(@RequestBody TeacherDTO teacherEntity, @PathVariable("teacherId") Long teacherId) {
+        final Teacher teacher = TeacherDTO.map(teacherEntity);
+        teacher.setId(teacherId);
+        return studentService.update(teacher);
     }
 
     @DeleteMapping("/students/id/{studentId}")
