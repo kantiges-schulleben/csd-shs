@@ -11,6 +11,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MenuService {
@@ -21,7 +22,7 @@ public class MenuService {
     private static final String DEVELOPER_MENU_NAME = "Developer";
     private static final String DEVELOPER_MENU_LOCATION = "/controlpanel";
     private static final String SHS_ADMIN_MENU_NAME = "SHS Admin";
-    private static final String SHS_ADMIN_MENU_LOCATION = "/shs-admin";
+    private static final String SHS_ADMIN_MENU_LOCATION = "/shs/admin";
 
     private static final MenuItemEntity LOGIN_MENU_ITEM = new MenuItemEntity(LOGIN_MENU_NAME, LOGIN_MENU_LOCATION);
     private static final MenuItemEntity LOGOUT_MENU_ITEM = new MenuItemEntity(LOGOUT_MENU_NAME, LOGOUT_MENU_LOCATION);
@@ -29,6 +30,11 @@ public class MenuService {
     private static final MenuItemEntity SHS_ADMIN_MENU_ITEM = new MenuItemEntity(SHS_ADMIN_MENU_NAME, SHS_ADMIN_MENU_LOCATION);
 
     private static final List<MenuItemEntity> MENU_PUBLIC_USER = List.of(LOGIN_MENU_ITEM);
+
+    private static final Map<String, MenuItemEntity> MENU_ITEM_MAP = Map.of(
+            WellKnownPermissions.DEVELOPER.getName(), DEVELOPER_MENU_ITEM,
+            WellKnownPermissions.SHS_ADMIN.getName(), SHS_ADMIN_MENU_ITEM
+    );
 
     private final PermissionService permissionService;
 
@@ -51,16 +57,23 @@ public class MenuService {
 
         final List<MenuItemEntity> menuItems = new ArrayList<>();
 
-        for (UserPermissions permission : permissions) {
-            switch (permission.getPermission().getInternalName()) {
-                case "developer" -> menuItems.add(DEVELOPER_MENU_ITEM);
-                case "shs_admin" -> menuItems.add(SHS_ADMIN_MENU_ITEM);
-                default -> {
-                    // Handle other permissions if needed
-                }
+        if (hasDeveloperPermission(permissions)) {
+            menuItems.addAll(MENU_ITEM_MAP.values());
+        } else {
+            for (UserPermissions permission : permissions) {
+                final MenuItemEntity menuItem = MENU_ITEM_MAP.get(permission.getPermission().getInternalName());
+                menuItems.add(menuItem);
             }
         }
+
+        menuItems.sort(Comparator.comparing(MenuItemEntity::getName));
+
         menuItems.add(LOGOUT_MENU_ITEM);
         return menuItems;
+    }
+
+    private boolean hasDeveloperPermission(List<UserPermissions> permissions) {
+        return permissions.stream()
+                .anyMatch(p -> p.getPermission().getInternalName().equals(WellKnownPermissions.DEVELOPER.getName()));
     }
 }

@@ -23,6 +23,10 @@ public class StudentService {
         return mapToStudent(studentRepository.save(entity));
     }
 
+    public long getEnrolledStudentCount() {
+        return studentRepository.count();
+    }
+
     private EnrolledStudentEntity map(Teacher teacher) {
         final EnrolledStudentEntity entity = new EnrolledStudentEntity();
         entity.setId(teacher.getId());

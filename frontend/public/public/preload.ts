@@ -108,13 +108,16 @@ function preload() {
           const li: HTMLLIElement = document.createElement("li");
           const link: HTMLAnchorElement = document.createElement("a");
           link.textContent = item.name;
-          link.href = backend + item.location;
+          link.href = item.location;
           if (item.location === "/api/users/logout") {
+            link.href = backend + item.location;
             link.addEventListener("click", (e: Event) => {
               e.preventDefault();
               localStorage.removeItem("csd_token");
               location.assign(`${backend}${item.location}`);
             });
+          } else if (item.location === "/oauth2/authorization/github") {
+            link.href = backend + item.location;
           }
 
           li.appendChild(link);

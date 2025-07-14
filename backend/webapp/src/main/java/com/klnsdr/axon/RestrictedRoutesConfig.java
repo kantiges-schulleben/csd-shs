@@ -1,6 +1,7 @@
 package com.klnsdr.axon;
 
 import com.klnsdr.axon.auth.RequestRouteMatcher;
+import com.klnsdr.axon.permissions.WellKnownPermissions;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -10,6 +11,7 @@ public class RestrictedRoutesConfig {
                 .post("/api/shs/enroll/student")
                 .post("/api/shs/enroll/teacher")
                 .getWantsInfo("/api/users/menu")
+                .getNeedsPermission("/api/shs/admin/students/count", WellKnownPermissions.SHS_ADMIN.getName())
                 .build();
     }
 }

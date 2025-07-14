@@ -1,7 +1,9 @@
 package com.klnsdr.axon.auth;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class responsible for matching HTTP request routes to determine if they are restricted.
@@ -15,6 +17,10 @@ public class RequestRouteMatcher {
     private final List<String> postRoutesOptional;
     private final List<String> putRoutesOptional;
     private final List<String> deleteRoutesOptional;
+    private final Map<String, List<String>> getRoutesNeedsPermission;
+    private final Map<String, List<String>> postRoutesNeedsPermission;
+    private final Map<String, List<String>> putRoutesNeedsPermission;
+    private final Map<String, List<String>> deleteRoutesNeedsPermission;
 
     /**
      * Constructs a new RequestRouteMatcher with the specified routes for each HTTP method.
@@ -32,7 +38,11 @@ public class RequestRouteMatcher {
             List<String> getRoutesOptional,
             List<String> postRoutesOptional,
             List<String> putRoutesOptional,
-            List<String> deleteRoutesOptional
+            List<String> deleteRoutesOptional,
+            Map<String, List<String>> getRoutesNeedsPermission,
+            Map<String, List<String>> postRoutesNeedsPermission,
+            Map<String, List<String>> putRoutesNeedsPermission,
+            Map<String, List<String>> deleteRoutesNeedsPermission
     ) {
         this.getRoutes = getRoutes;
         this.postRoutes = postRoutes;
@@ -42,6 +52,10 @@ public class RequestRouteMatcher {
         this.postRoutesOptional = postRoutesOptional;
         this.putRoutesOptional = putRoutesOptional;
         this.deleteRoutesOptional = deleteRoutesOptional;
+        this.getRoutesNeedsPermission = getRoutesNeedsPermission;
+        this.postRoutesNeedsPermission = postRoutesNeedsPermission;
+        this.putRoutesNeedsPermission = putRoutesNeedsPermission;
+        this.deleteRoutesNeedsPermission = deleteRoutesNeedsPermission;
     }
 
     /**
@@ -71,6 +85,52 @@ public class RequestRouteMatcher {
         };
     }
 
+    public boolean isRestrictedRouteNeedsPermission(String path, String method) {
+        return !getNeededPermissions(path, method).isEmpty();
+    }
+
+    public List<String> getNeededPermissions(String path, String method) {
+        return switch (method.toUpperCase()) {
+            case "GET" -> {
+                final List<String> keys = getRoutesNeedsPermission.keySet().stream()
+                        .filter(path::matches)
+                        .toList();
+                if (keys.isEmpty()) {
+                    yield List.of();
+                }
+                yield getRoutesNeedsPermission.get(keys.getFirst());
+            }
+            case "POST" -> {
+                final List<String> keys = postRoutesNeedsPermission.keySet().stream()
+                        .filter(path::matches)
+                        .toList();
+                if (keys.isEmpty()) {
+                    yield List.of();
+                }
+                yield postRoutesNeedsPermission.get(keys.getFirst());
+            }
+            case "PUT" -> {
+                final List<String> keys = putRoutesNeedsPermission.keySet().stream()
+                        .filter(path::matches)
+                        .toList();
+                if (keys.isEmpty()) {
+                    yield List.of();
+                }
+                yield putRoutesNeedsPermission.get(keys.getFirst());
+            }
+            case "DELETE" -> {
+                final List<String> keys = deleteRoutesNeedsPermission.keySet().stream()
+                        .filter(path::matches)
+                        .toList();
+                if (keys.isEmpty()) {
+                    yield List.of();
+                }
+                yield deleteRoutesNeedsPermission.get(keys.getFirst());
+            }
+            default -> List.of();
+        };
+    }
+
     /**
      * Creates a new builder for constructing a RequestRouteMatcher.
      *
@@ -93,6 +153,10 @@ public class RequestRouteMatcher {
         private final List<String> postRoutesOptional = new ArrayList<>();
         private final List<String> putRoutesOptional = new ArrayList<>();
         private final List<String> deleteRoutesOptional = new ArrayList<>();
+        private final Map<String, List<String>> getRoutesNeedsPermission = new HashMap<>();
+        private final Map<String, List<String>> postRoutesNeedsPermission = new HashMap<>();
+        private final Map<String, List<String>> putRoutesNeedsPermission = new HashMap<>();
+        private final Map<String, List<String>> deleteRoutesNeedsPermission = new HashMap<>();
 
         /**
          * Adds a GET route to the builder.
@@ -108,6 +172,11 @@ public class RequestRouteMatcher {
         public RestrictedRoutesBuilder getWantsInfo(String path) {
             getRoutesOptional.add(path);
             get(path);
+            return this;
+        }
+
+        public RestrictedRoutesBuilder getNeedsPermission(String path, String permission) {
+            getRoutesNeedsPermission.computeIfAbsent(path, k -> new ArrayList<>()).add(permission);
             return this;
         }
 
@@ -128,6 +197,11 @@ public class RequestRouteMatcher {
             return this;
         }
 
+        public RestrictedRoutesBuilder postNeedsPermission(String path, String permission) {
+            postRoutesNeedsPermission.computeIfAbsent(path, k -> new ArrayList<>()).add(permission);
+            return this;
+        }
+
         /**
          * Adds a PUT route to the builder.
          *
@@ -142,6 +216,11 @@ public class RequestRouteMatcher {
         public RestrictedRoutesBuilder putWantsInfo(String path) {
             putRoutesOptional.add(path);
             put(path);
+            return this;
+        }
+
+        public RestrictedRoutesBuilder putNeedsPermission(String path, String permission) {
+            putRoutesNeedsPermission.computeIfAbsent(path, k -> new ArrayList<>()).add(permission);
             return this;
         }
 
@@ -162,6 +241,11 @@ public class RequestRouteMatcher {
             return this;
         }
 
+        public RestrictedRoutesBuilder deleteNeedsPermission(String path, String permission) {
+            deleteRoutesNeedsPermission.computeIfAbsent(path, k -> new ArrayList<>()).add(permission);
+            return this;
+        }
+
         /**
          * Builds and returns a RequestRouteMatcher with the specified routes.
          *
@@ -176,6 +260,11 @@ public class RequestRouteMatcher {
             postRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
             putRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
             deleteRoutesOptional.replaceAll(route -> route.replace("*", PATTERN_STAR));
+            processNeedsPermissionMap(getRoutesNeedsPermission);
+            processNeedsPermissionMap(postRoutesNeedsPermission);
+            processNeedsPermissionMap(putRoutesNeedsPermission);
+            processNeedsPermissionMap(deleteRoutesNeedsPermission);
+
             return new RequestRouteMatcher(
                     getRoutes,
                     postRoutes,
@@ -184,8 +273,24 @@ public class RequestRouteMatcher {
                     getRoutesOptional,
                     postRoutesOptional,
                     putRoutesOptional,
-                    deleteRoutesOptional
+                    deleteRoutesOptional,
+                    getRoutesNeedsPermission,
+                    postRoutesNeedsPermission,
+                    putRoutesNeedsPermission,
+                    deleteRoutesNeedsPermission
             );
+        }
+
+        private static void processNeedsPermissionMap(Map<String, List<String>> map) {
+            final Map<String, List<String>> tmpMap = new HashMap<>();
+
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                String path = entry.getKey().replace("*", PATTERN_STAR);
+                List<String> permissions = entry.getValue();
+                tmpMap.put(path, permissions);
+            }
+            map.clear();
+            map.putAll(tmpMap);
         }
     }
 }
