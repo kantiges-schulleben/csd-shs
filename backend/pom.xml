@@ -14,6 +14,7 @@
         <module>user</module>
         <module>menu</module>
         <module>shs</module>
+        <module>permissions</module>
     </modules>
 
     <dependencies>

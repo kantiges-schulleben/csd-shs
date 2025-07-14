@@ -23,4 +23,8 @@ public class UserService {
         user.setName(name);
         return userRepository.save(user);
     }
+
+    public Optional<UserEntity> getAdminUser() {
+        return userRepository.findById(1L);
+    }
 }
