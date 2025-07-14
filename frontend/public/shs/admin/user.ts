@@ -84,7 +84,7 @@ function markupUser(): obj {
                                                             children: [
                                                                 {
                                                                     tag: 'lable',
-                                                                    text: 'accountID:',
+                                                                    text: 'Nachname:',
                                                                 },
                                                             ],
                                                         },
@@ -92,8 +92,8 @@ function markupUser(): obj {
                                                             tag: 'td',
                                                             children: [
                                                                 {
-                                                                    tag: 'lable',
-                                                                    id: 'outputID',
+                                                                    tag: 'input',
+                                                                    id: 'inputSureName',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -119,7 +119,8 @@ function markupUser(): obj {
                                                             children: [
                                                                 {
                                                                     tag: 'input',
-                                                                    id: 'inputKlasse',
+                                                                    id: 'inputGrade',
+                                                                    type: 'number',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -171,7 +172,7 @@ function markupUser(): obj {
                                                             children: [
                                                                 {
                                                                     tag: 'input',
-                                                                    id: 'inputTelefon',
+                                                                    id: 'inputPhone',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -197,11 +198,12 @@ function markupUser(): obj {
                                                             children: [
                                                                 {
                                                                     tag: 'select',
-                                                                    id: 'selectFach',
+                                                                    id: 'selectSubject',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
                                                                     children: [
+                                                                      // TODO use file for constant
                                                                         '',
                                                                         'Deutsch',
                                                                         'Englisch',
@@ -257,7 +259,7 @@ function markupUser(): obj {
                                                             children: [
                                                                 {
                                                                     tag: 'select',
-                                                                    id: 'selectArt',
+                                                                    id: 'selectIsGroup',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -297,7 +299,7 @@ function markupUser(): obj {
                                                             children: [
                                                                 {
                                                                     tag: 'select',
-                                                                    id: 'selectTyp',
+                                                                    id: 'selectIsTeacher',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -315,6 +317,33 @@ function markupUser(): obj {
                                                                             };
                                                                         }
                                                                     ),
+                                                                },
+                                                            ],
+                                                        },
+                                                    ],
+                                                },
+                                                {
+                                                    tag: 'tr',
+                                                    children: [
+                                                        {
+                                                            tag: 'td',
+                                                            children: [
+                                                                {
+                                                                    tag: 'lable',
+                                                                    text: 'geben für:',
+                                                                },
+                                                            ],
+                                                        },
+                                                        {
+                                                            tag: 'td',
+                                                            children: [
+                                                                {
+                                                                    tag: 'input',
+                                                                    id: 'inputTarget',
+                                                                    type: 'number',
+                                                                    classes: [
+                                                                        'outputDetails',
+                                                                    ],
                                                                 },
                                                             ],
                                                         },
@@ -346,11 +375,18 @@ function markupUser(): obj {
 }
 
 interface EnrolledStudent {
+  id: number;
   name: string;
   sureName: string;
-  teacher: boolean;
+  mail: string;
+  targetGrade: number;
   subject: string;
+  grade: number;
+  phoneNumber: string;
+  group: boolean;
+  teacher: boolean;
 };
+
 function searchStudents() {
     let username: string = (edom.findById('inputUserName') as edomInputElement)
         .value;
@@ -410,14 +446,14 @@ function searchStudents() {
                       text: user.subject,
                   },
               ],
-              // handler: [
-              //     {
-              //         type: 'click',
-              //         id: 'clickOpenDetails',
-              //         arguments: '',
-              //         body: `populateDetails("${user}")`,
-              //     },
-              // ],
+              handler: [
+                  {
+                      type: 'click',
+                      id: 'clickOpenDetails',
+                      arguments: '',
+                      body: `populateDetails(${JSON.stringify(user)})`,
+                  },
+              ],
           });
           counter++;
       });
@@ -438,50 +474,49 @@ function searchStudents() {
     });
 }
 
-function populateDetails(userID: string) {
-    $.get('/shs/admin/userdata/' + userID, (data: obj) => {
-        const inputs: string[] = [
-            'inputName',
-            'inputKlasse',
-            'inputMail',
-            'inputTelefon',
-        ];
-        const keys: string[] = ['name', 'klasse', 'mail', 'telefon'];
-        edom.findById('outputID')?.setText(data.userdata.accountID);
+function populateDetails(student: EnrolledStudent | obj) {
+  const inputs: string[] = [
+      'inputName',
+      'inputSureName',
+      'inputGrade',
+      'inputMail',
+      'inputPhone',
+      'inputTarget',
+  ];
+  const keys: string[] = ['name', 'sureName', 'grade', 'mail', 'phoneNumber', 'targetGrade'];
 
-        inputs.forEach((val: string, index: number) => {
-            (edom.findById(val) as edomInputElement).setContent(
-                data.userdata[keys[index]]
-            );
-        });
+  inputs.forEach((val: string, index: number) => {
+      (edom.findById(val) as edomInputElement).setContent(
+          (student as obj)[keys[index]]
+      );
+  });
 
-        (edom.findById('selectFach')?.element as HTMLSelectElement).value =
-            data.userdata.fach;
+  (edom.findById('selectSubject')?.element as HTMLSelectElement).value =
+      student.subject;
 
-        (edom.findById('selectArt')?.element as HTMLSelectElement).value =
-            data.userdata.einzelnachhilfe == '0'
-                ? 'Einzelnachhilfe'
-                : 'Gruppennachhilfe';
+  (edom.findById('selectIsGroup')?.element as HTMLSelectElement).value =
+      student.group
+          ? 'Gruppennachhilfe'
+          : 'Einzelnachhilfe';
 
-        (edom.findById('selectTyp')?.element as HTMLSelectElement).value =
-            data.userdata.nachhilfe == '0' ? 'Schüler*in' : 'Lehrer*in';
+  (edom.findById('selectIsTeacher')?.element as HTMLSelectElement).value =
+      student.teacher ? 'Lehrer*in' : "Schüler*in";
 
-        edom.findById('bttnSave')?.deleteClick('clickSave');
-        edom.findById('bttnSave')?.addClick(
-            'clickSave',
-            (self: edomElement) => {
-                saveDetails(userID);
-            }
-        );
+  edom.findById('bttnSave')?.deleteClick('clickSave');
+  edom.findById('bttnSave')?.addClick(
+      'clickSave',
+      (self: edomElement) => {
+          // saveDetails(userID);
+      }
+  );
 
-        edom.findById('bttnDelete')?.deleteClick('clickDelete');
-        edom.findById('bttnDelete')?.addClick(
-            'clickDelete',
-            (self: edomElement) => {
-                deleteUser(userID, data.userdata.name);
-            }
-        );
-    });
+  edom.findById('bttnDelete')?.deleteClick('clickDelete');
+  edom.findById('bttnDelete')?.addClick(
+      'clickDelete',
+      (self: edomElement) => {
+          // deleteUser(userID, data.userdata.name);
+      }
+  );
     window.scrollTo(0, 0);
 }
 

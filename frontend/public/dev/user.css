@@ -74,11 +74,13 @@ td {
 
 #inputMail,
 #inputName,
-#inputKlasse,
-#inputTelefon,
-#selectFach,
-#selectArt,
-#selectTyp {
+#inputSureName,
+#inputGrade,
+#inputTarget,
+#inputPhone,
+#selectSubject,
+#selectIsGroup,
+#selectIsTeacher {
     width: 100% !important;
 }
 
