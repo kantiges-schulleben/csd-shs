@@ -1,8 +1,12 @@
 package com.klnsdr.axon.shs.admin;
 
+import com.klnsdr.axon.shs.entity.EnrolledStudentEntity;
 import com.klnsdr.axon.shs.service.StudentService;
+import jakarta.websocket.server.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/shs/admin")
@@ -19,21 +23,21 @@ public class ShsAdminResource {
     }
 
     @GetMapping("/students/search")
-    public ResponseEntity<?> searchStudents() {
-        return ResponseEntity.status(501).build();
+    public List<EnrolledStudentEntity> searchStudents(@RequestParam("q") String query) {
+        return studentService.searchByName(query);
     }
 
-    @GetMapping("/students/{studentId}")
+    @GetMapping("/students/id/{studentId}")
     public ResponseEntity<?> getStudentDetails() {
         return ResponseEntity.status(501).build();
     }
 
-    @PutMapping("/students/{studentId}")
+    @PutMapping("/students/id/{studentId}")
     public ResponseEntity<?> updateStudentDetails() {
         return ResponseEntity.status(501).build();
     }
 
-    @DeleteMapping("/students/{studentId}")
+    @DeleteMapping("/students/id/{studentId}")
     public ResponseEntity<?> deleteStudent() {
         return ResponseEntity.status(501).build();
     }

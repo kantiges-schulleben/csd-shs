@@ -345,82 +345,97 @@ function markupUser(): obj {
     ];
 }
 
+interface EnrolledStudent {
+  name: string;
+  sureName: string;
+  teacher: boolean;
+  subject: string;
+};
 function searchStudents() {
     let username: string = (edom.findById('inputUserName') as edomInputElement)
         .value;
 
-    $.post(
-        '/shs/admin/searchUser',
-        {
-            username: username,
-        },
-        (data: obj) => {
-            edom.findById('outputSearch')?.clear();
+    fetch(`${backend}/api/shs/admin/students/search?q=${username}`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+      }
+    })
+    .then((response: Response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+      }
+      return response.json();
+    })
+    .then((data: EnrolledStudent[]) => {
+      edom.findById('outputSearch')?.clear();
 
-            let rows: obj[] = [
-                {
-                    tag: 'tr',
-                    classes: ['tableHead'],
-                    children: [
-                        {
-                            tag: 'td',
-                            text: 'ID',
-                        },
-                        {
-                            tag: 'td',
-                            text: 'Name',
-                        },
-                        {
-                            tag: 'td',
-                            text: 'Fach',
-                        },
-                    ],
-                },
-            ];
+      let rows: obj[] = [
+          {
+              tag: 'tr',
+              classes: ['tableHead'],
+              children: [
+                  {
+                      tag: 'td',
+                      text: '',
+                  },
+                  {
+                      tag: 'td',
+                      text: 'Name',
+                  },
+                  {
+                      tag: 'td',
+                      text: 'Fach',
+                  },
+              ],
+          },
+      ];
 
-            let counter: number = 0;
+      let counter: number = 0;
 
-            data.userlist.forEach((user: obj) => {
-                rows.push({
-                    tag: 'tr',
-                    classes: ['outputTable', `line${counter % 2}`],
-                    children: [
-                        {
-                            tag: 'td',
-                            text: user.id,
-                        },
-                        {
-                            tag: 'td',
-                            text: user.name,
-                        },
-                        {
-                            tag: 'td',
-                            text: user.fach,
-                        },
-                    ],
-                    handler: [
-                        {
-                            type: 'click',
-                            id: 'clickOpenDetails',
-                            arguments: '',
-                            body: `populateDetails("${user.id}")`,
-                        },
-                    ],
-                });
-                counter++;
-            });
+      data.forEach((user: EnrolledStudent) => {
+          rows.push({
+              tag: 'tr',
+              classes: ['outputTable', `line${counter % 2}`],
+              children: [
+                  {
+                      tag: 'td',
+                      text: user.teacher ? "Lehrer*in" : "Schüler*in",
+                  },
+                  {
+                      tag: 'td',
+                      text: user.name + " " + user.sureName,
+                  },
+                  {
+                      tag: 'td',
+                      text: user.subject,
+                  },
+              ],
+              // handler: [
+              //     {
+              //         type: 'click',
+              //         id: 'clickOpenDetails',
+              //         arguments: '',
+              //         body: `populateDetails("${user}")`,
+              //     },
+              // ],
+          });
+          counter++;
+      });
 
-            edom.fromTemplate(
-                [
-                    {
-                        tag: 'table',
-                        children: rows,
-                    },
-                ],
-                edom.findById('outputSearch')
-            );
-        }
-    );
+      edom.fromTemplate(
+          [
+              {
+                  tag: 'table',
+                  children: rows,
+              },
+          ],
+          edom.findById('outputSearch')
+      );
+    })
+    .catch((e: any) => {
+      console.error(e);
+      (document.getElementById('counter') as HTMLLabelElement).innerHTML = "<i>Die Anzahl der angemeldeten Schüler*innen konnte nicht abgerufen werden</i>";
+    });
 }
 
 function populateDetails(userID: string) {

@@ -12,6 +12,7 @@ public class RestrictedRoutesConfig {
                 .post("/api/shs/enroll/teacher")
                 .getWantsInfo("/api/users/menu")
                 .getNeedsPermission("/api/shs/admin/students/count", WellKnownPermissions.SHS_ADMIN.getName())
+                .getNeedsPermission("/api/shs/admin/students/search", WellKnownPermissions.SHS_ADMIN.getName())
                 .build();
     }
 }

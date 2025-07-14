@@ -5,6 +5,8 @@ import com.klnsdr.axon.shs.entity.Student;
 import com.klnsdr.axon.shs.entity.Teacher;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StudentService {
     private final StudentRepository studentRepository;
@@ -25,6 +27,13 @@ public class StudentService {
 
     public long getEnrolledStudentCount() {
         return studentRepository.count();
+    }
+
+    public List<EnrolledStudentEntity> searchByName(String query) {
+        if (query == null) {
+            return List.of();
+        }
+        return studentRepository.findByNameContainingIgnoreCase(query);
     }
 
     private EnrolledStudentEntity map(Teacher teacher) {
