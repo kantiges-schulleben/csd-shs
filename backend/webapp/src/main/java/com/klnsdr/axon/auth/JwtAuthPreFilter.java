@@ -86,15 +86,15 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String username = jwtUtil.extractSubject(token);
+        final Long userId = jwtUtil.extractUserId(token);
 
-        if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+        if (userId == null || SecurityContextHolder.getContext().getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final UserDetails userDetails = User.builder()
-                .username(username)
+                .username(userId.toString())
                 .password("")
                 .build();
 
@@ -124,15 +124,15 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
             return;
         }
 
-        final String username = jwtUtil.extractSubject(token);
+        final Long userId = jwtUtil.extractUserId(token);
 
-        if (username == null || SecurityContextHolder.getContext().getAuthentication() != null) {
+        if (userId == null || SecurityContextHolder.getContext().getAuthentication() != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final UserDetails userDetails = User.builder()
-                .username(username)
+                .username(userId.toString())
                 .password("")
                 .build();
 

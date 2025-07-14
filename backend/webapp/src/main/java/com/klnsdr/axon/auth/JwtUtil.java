@@ -61,8 +61,8 @@ public class JwtUtil {
      * @param token the JWT token
      * @return the username
      */
-    public String extractUsername(String token) {
-        return extractClaim(token, jwt -> jwt.getClaim("username").asString());
+    public Long extractUserId(String token) {
+        return extractClaim(token, jwt -> jwt.getClaim("id").asLong());
     }
 
     /**
@@ -111,8 +111,8 @@ public class JwtUtil {
      * @return true if the token is valid, false otherwise
      */
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String subject = extractSubject(token);
-        return (subject.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String userId = extractUserId(token).toString();
+        return (userId.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     /**

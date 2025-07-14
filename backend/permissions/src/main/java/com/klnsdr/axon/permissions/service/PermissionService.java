@@ -24,7 +24,7 @@ public class PermissionService {
         permission.setName(name);
         permission.setInternalName(getInternalName(name));
 
-        if (permissionRepository.findByName(permission.getName()).isPresent()) {
+        if (permissionRepository.findByInternalName(permission.getInternalName()).isPresent()) {
             throw new IllegalArgumentException("Permission with name '" + name + "' already exists.");
         }
 
@@ -32,7 +32,7 @@ public class PermissionService {
     }
 
     public Optional<Permission> getPermissionByName(String name) {
-        return permissionRepository.findByName(name);
+        return permissionRepository.findByInternalName(name);
     }
 
     public boolean addPermissionToUser(UserEntity user, Permission permission) {
@@ -48,8 +48,17 @@ public class PermissionService {
         return true;
     }
 
+    public List<UserPermissions> getUserPermissions(UserEntity user) {
+        return userPermissionsRepository.findByUserId(user.getId());
+    }
+
+    public List<UserPermissions> getUserPermissions(Long userId) {
+        return userPermissionsRepository.findByUserId(userId);
+    }
+
+
     public boolean existsDevPermission() {
-        return permissionRepository.findByName(WellKnownPermissions.DEVELOPER.getName()).isPresent();
+        return permissionRepository.findByInternalName(WellKnownPermissions.DEVELOPER.getName()).isPresent();
     }
 
     private String getInternalName(String name) {
