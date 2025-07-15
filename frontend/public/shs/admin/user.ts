@@ -514,7 +514,7 @@ function populateDetails(student: EnrolledStudent | obj) {
   edom.findById('bttnDelete')?.addClick(
       'clickDelete',
       (self: edomElement) => {
-          // deleteUser(userID, data.userdata.name);
+          deleteUser(student.id, `${student.name} ${student.sureName}`);
       }
   );
     window.scrollTo(0, 0);
@@ -579,18 +579,28 @@ function deleteUser(userID: string, name: string) {
         edom.findById('bttnDelete')?.applyStyle('fa', 'fa-spinner');
         edom.findById('bttnDelete')?.setText('');
 
-        $.get(`/shs/admin/deleteUser/${userID}`, (data: obj) => {
-            if (data.success) {
-                edom.findById('bttnDelete')?.removeStyle('fa', 'fa-spinner');
-                edom.findById('bttnDelete')?.setText('löschen');
-                clearDetails();
-                searchStudents();
-            } else {
-                edom.findById('bttnDelete')?.swapStyle(
-                    'fa-spinner',
-                    'fa-times'
-                );
-            }
+        fetch(`${backend}/api/shs/admin/students/id/${userID}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+          }
+        })
+        .then((response: Response) => {
+          if (response.status !== 204) {
+            throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+          }
+          edom.findById('bttnDelete')?.removeStyle('fa', 'fa-spinner');
+          edom.findById('bttnDelete')?.setText('löschen');
+          clearDetails();
+          searchStudents();
+        })
+        .catch((e: any) => {
+          console.error(e);
+          edom.findById('bttnDelete')?.swapStyle(
+              'fa-spinner',
+              'fa-times'
+          );
         });
     }
 }

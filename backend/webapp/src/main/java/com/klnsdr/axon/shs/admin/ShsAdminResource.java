@@ -47,8 +47,12 @@ public class ShsAdminResource {
     }
 
     @DeleteMapping("/students/id/{studentId}")
-    public ResponseEntity<?> deleteStudent() {
-        return ResponseEntity.status(501).build();
+    public ResponseEntity<?> deleteStudent(@PathVariable("studentId") Long studentId) {
+        final EnrolledStudentEntity deletedEntity = studentService.delete(studentId);
+        if (deletedEntity == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/start")

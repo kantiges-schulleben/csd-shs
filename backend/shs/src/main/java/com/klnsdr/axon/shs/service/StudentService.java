@@ -6,6 +6,7 @@ import com.klnsdr.axon.shs.entity.Teacher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StudentService {
@@ -50,6 +51,16 @@ public class StudentService {
         }
 
         return studentRepository.save(map(student));
+    }
+
+    public EnrolledStudentEntity delete(long id) {
+        final Optional<EnrolledStudentEntity> entity = studentRepository.findById(id);
+        if (entity.isEmpty()) {
+            return null;
+        }
+        final EnrolledStudentEntity entityToDelete = entity.get();
+        studentRepository.delete(entityToDelete);
+        return entityToDelete;
     }
 
     private EnrolledStudentEntity map(Teacher teacher) {
