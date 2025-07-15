@@ -6,6 +6,7 @@ import com.klnsdr.axon.shs.entity.EnrolledStudentEntity;
 import com.klnsdr.axon.shs.entity.Student;
 import com.klnsdr.axon.shs.entity.Teacher;
 import com.klnsdr.axon.shs.service.StudentService;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,6 +58,18 @@ public class ShsAdminResource {
 
     @PostMapping("/start")
     public ResponseEntity<?> startAnalysis() {
-        return ResponseEntity.status(501).build();
+        studentService.runAnalysis();
+        return ResponseEntity.accepted().build();
+    }
+
+    @GetMapping("/analysis/running")
+    public ResponseEntity<Boolean> getIsAnalysisRunning() {
+        final boolean status = studentService.isAnalysisRunning();
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/analysis/status")
+    public Pair<Boolean, String> getAnalysisStatus() {
+        return studentService.getAnalysisStatus();
     }
 }

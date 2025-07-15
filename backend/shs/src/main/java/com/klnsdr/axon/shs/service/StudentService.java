@@ -1,19 +1,39 @@
 package com.klnsdr.axon.shs.service;
 
+import com.klnsdr.axon.shs.entity.AnalysisResultEntity;
 import com.klnsdr.axon.shs.entity.EnrolledStudentEntity;
 import com.klnsdr.axon.shs.entity.Student;
 import com.klnsdr.axon.shs.entity.Teacher;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.util.Pair;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class StudentService {
+    private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
     private final StudentRepository studentRepository;
+    private final LockedStudentRepository lockedStudentRepository;
+    private final CopyStudentDataHelper copyStudentDataHelper;
+    private final AnalysisResultRepository analysisResultRepository;
 
-    public StudentService(StudentRepository studentRepository) {
+    public StudentService(
+            StudentRepository studentRepository,
+            LockedStudentRepository lockedStudentRepository,
+            CopyStudentDataHelper copyStudentDataHelper,
+            AnalysisResultRepository analysisResultRepository
+    ) {
         this.studentRepository = studentRepository;
+        this.lockedStudentRepository = lockedStudentRepository;
+        this.copyStudentDataHelper = copyStudentDataHelper;
+        this.analysisResultRepository = analysisResultRepository;
     }
 
     public Teacher createTeacher(Teacher teacher) {
@@ -61,6 +81,55 @@ public class StudentService {
         final EnrolledStudentEntity entityToDelete = entity.get();
         studentRepository.delete(entityToDelete);
         return entityToDelete;
+    }
+
+    private final AtomicBoolean running = new AtomicBoolean(false);
+
+    @Async
+    public void runAnalysis() {
+        if (!running.compareAndSet(false, true)) {
+            logger.warn("Task already running");
+            return;
+        }
+
+        final boolean didClear = copyStudentDataHelper.clearLockedStudentsTable();
+        if (!didClear) {
+            logger.error("Failed to clear locked students table");
+            writeAnalysisStatusToDatabase(false, "Failed to clear locked students table");
+            running.set(false);
+            return;
+        }
+
+        final boolean didCopy = copyStudentDataHelper.copyStudentsTable();
+        if (!didCopy) {
+            logger.error("Failed to copy students table");
+            writeAnalysisStatusToDatabase(false, "Failed to copy students table");
+            running.set(false);
+            return;
+        }
+
+        writeAnalysisStatusToDatabase(true, "");
+        running.set(false);
+    }
+
+    public Pair<Boolean, String> getAnalysisStatus() {
+        final List<AnalysisResultEntity> results = analysisResultRepository.findAll();
+        if (results.isEmpty()) {
+            return Pair.of(false, "No analysis results found");
+        }
+        final AnalysisResultEntity latestResult = results.getLast();
+        return Pair.of(latestResult.isWasSuccessful(), latestResult.getErrorMessage());
+    }
+
+    private void writeAnalysisStatusToDatabase(boolean status, String message) {
+        final AnalysisResultEntity result = new AnalysisResultEntity();
+        result.setWasSuccessful(status);
+        result.setErrorMessage(message);
+        analysisResultRepository.save(result);
+    }
+
+    public boolean isAnalysisRunning() {
+        return running.get();
     }
 
     private EnrolledStudentEntity map(Teacher teacher) {

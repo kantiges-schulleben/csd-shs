@@ -16,6 +16,9 @@ public class RestrictedRoutesConfig {
                 .getNeedsPermission("/api/shs/admin/students/id/*", WellKnownPermissions.SHS_ADMIN.getName())
                 .putNeedsPermission("/api/shs/admin/students/id/*", WellKnownPermissions.SHS_ADMIN.getName())
                 .deleteNeedsPermission("/api/shs/admin/students/id/*", WellKnownPermissions.SHS_ADMIN.getName())
+                .postNeedsPermission("/api/shs/admin/start", WellKnownPermissions.SHS_ADMIN.getName())
+                .getNeedsPermission("/api/shs/admin/analysis/status", WellKnownPermissions.SHS_ADMIN.getName())
+                .getNeedsPermission("/api/shs/admin/analysis/running", WellKnownPermissions.SHS_ADMIN.getName())
                 .build();
     }
 }

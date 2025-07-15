@@ -63,7 +63,6 @@ function startup() {
 const backend: string = "http://localhost:8080";
 
 function displayStudentCount() {
-        // (document.getElementById('counter') as HTMLLabelElement).innerText =
     fetch(`${backend}/api/shs/admin/students/count`, {
       headers: {
         "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
@@ -84,16 +83,84 @@ function displayStudentCount() {
     });
 }
 
+let statusTimer: number;
+
 function startScript() {
     if (confirm('Auswertung starten?')) {
-        (document.getElementById('output') as HTMLParagraphElement).innerText =
-            'auswertung gestartet...';
-        $.get('/shs/admin/start', function (data: {[key: string]: any}) {
-            if (!data["success"]) {
-              (document.getElementById('output') as HTMLParagraphElement).innerText = "Es ist ein Fehler bei der Auswertung aufgetreten";
-            } else {
-              (document.getElementById('output') as HTMLParagraphElement).innerText = "Auswertung erfolreich abgeschlossen";
-            }
+      (document.getElementById('output') as HTMLParagraphElement).innerText =
+          'auswertung gestartet...';
+        fetch(`${backend}/api/shs/admin/start`, {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+          },
+          method: "POST"
+        })
+        .then((response: Response) => {
+          if (response.status !== 202) {
+            throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+          }
+
+          statusTimer = setInterval(checkStatus, 1000);
+        })
+        .catch((e: any) => {
+          console.error(e);
+      (document.getElementById('output') as HTMLParagraphElement).innerText =
+          'Fehler beim Starten der Auswertung';
         });
     }
+}
+
+let dots = 0;
+
+function clearTimer() {
+  clearInterval(statusTimer);
+}
+
+function checkStatus() {
+    (document.getElementById('output') as HTMLParagraphElement).innerText =
+          `auswertung gestartet${".".repeat((++dots) % 4)}`;
+    fetch(`${backend}/api/shs/admin/analysis/running`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+      }
+    })
+    .then((response: Response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+      }
+      return response.json();
+    })
+    .then((running: boolean) => {
+      if (!running) {
+        clearTimer();
+        loadAnalysisResult();
+      }
+    })
+    .catch((e: any) => {
+      console.error(e);
+    });
+}
+
+function loadAnalysisResult() {
+    fetch(`${backend}/api/shs/admin/analysis/status`, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("csd_token")}`
+      }
+    })
+    .then((response: Response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status} ${response.statusText} - ${response.text()}`);
+      }
+      return response.json();
+    })
+    .then((status: {first: boolean, second: string}) => {
+      if (!status.first) {
+        (document.getElementById('output') as HTMLParagraphElement).innerText = status.second;
+        return;
+      }
+      (document.getElementById('output') as HTMLParagraphElement).innerText = "Auswertung erfolgreich abgeschlossen";
+    })
+    .catch((e: any) => {
+      console.error(e);
+    });
 }
