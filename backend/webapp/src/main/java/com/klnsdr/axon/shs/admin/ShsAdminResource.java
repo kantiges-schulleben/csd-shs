@@ -107,4 +107,13 @@ public class ShsAdminResource {
     public List<LockedEnrolledStudentEntity> getWithoutPartner() {
         return studentService.getWithoutPartner();
     }
+
+    @PutMapping("/pairs/id/{id}/release")
+    public ResponseEntity<?> releaseGroup(@PathVariable("id") Long id) {
+        if (studentService.releaseGroup(id)) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

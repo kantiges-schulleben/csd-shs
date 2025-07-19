@@ -98,6 +98,19 @@ public class StudentService {
         return lockedStudentRepository.getWithoutPartner();
     }
 
+    public boolean releaseGroup(Long id) {
+        final Optional<Group> group = groupService.findById(id);
+        if (group.isEmpty()) {
+            logger.warn("Group with ID {} not found", id);
+            return false;
+        }
+
+        final Group existingGroup = group.get();
+        existingGroup.setReleased(true);
+        groupService.save(existingGroup);
+        return true;
+    }
+
     public boolean resetData() {
         try {
 //            studentRepository.deleteAll();

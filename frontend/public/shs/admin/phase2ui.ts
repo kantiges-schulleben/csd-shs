@@ -144,22 +144,35 @@ function loadSingle() {
                                 ' ' +
                                 pair.students[0].sureName,
                         },
-                        {
-                            tag: 'div',
-                            classes: ['buttonBar'],
-                            children: [
-                                {
-                                    tag: 'button',
-                                    text: 'verwerfen',
-                                    classes: ['searchButton', 'dangerButton'],
-                                },
-                                {
-                                    tag: 'button',
-                                    text: 'freigeben',
-                                    classes: ['searchButton'],
-                                },
-                            ],
-                        },
+                        pair.released
+                            ? { tag: 'div' }
+                            : {
+                                  tag: 'div',
+                                  classes: ['buttonBar'],
+                                  children: [
+                                      {
+                                          tag: 'button',
+                                          text: 'verwerfen',
+                                          classes: [
+                                              'searchButton',
+                                              'dangerButton',
+                                          ],
+                                      },
+                                      {
+                                          tag: 'button',
+                                          text: 'freigeben',
+                                          classes: ['searchButton'],
+                                          handler: [
+                                              {
+                                                  type: 'click',
+                                                  id: 'clickReleaseGroup',
+                                                  arguments: '',
+                                                  body: `releaseGroup(${pair.id})`,
+                                              },
+                                          ],
+                                      },
+                                  ],
+                              },
                     ],
                 };
             });
@@ -215,22 +228,35 @@ function loadGroup() {
                                 };
                             }),
                         },
-                        {
-                            tag: 'div',
-                            classes: ['buttonBar'],
-                            children: [
-                                {
-                                    tag: 'button',
-                                    text: 'verwerfen',
-                                    classes: ['searchButton', 'dangerButton'],
-                                },
-                                {
-                                    tag: 'button',
-                                    text: 'freigeben',
-                                    classes: ['searchButton'],
-                                },
-                            ],
-                        },
+                        pair.released
+                            ? { tag: 'div' }
+                            : {
+                                  tag: 'div',
+                                  classes: ['buttonBar'],
+                                  children: [
+                                      {
+                                          tag: 'button',
+                                          text: 'verwerfen',
+                                          classes: [
+                                              'searchButton',
+                                              'dangerButton',
+                                          ],
+                                      },
+                                      {
+                                          tag: 'button',
+                                          text: 'freigeben',
+                                          classes: ['searchButton'],
+                                          handler: [
+                                              {
+                                                  type: 'click',
+                                                  id: 'clickReleaseGroup',
+                                                  arguments: '',
+                                                  body: `releaseGroup(${pair.id})`,
+                                              },
+                                          ],
+                                      },
+                                  ],
+                              },
                     ],
                 };
             });
@@ -337,11 +363,36 @@ function resetToPhase1() {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
         },
-    }).then((response: Response) => {
-        if (response.status === 200) {
-            location.reload();
-        } else {
+    })
+        .then((response: Response) => {
+            if (response.status === 200) {
+                location.reload();
+            } else {
+                alert('Beim Zurücksetzen ist ein Fehler aufgetreten.');
+            }
+        })
+        .catch((e: any) => {
+            console.error(e);
             alert('Beim Zurücksetzen ist ein Fehler aufgetreten.');
-        }
-    });
+        });
+}
+
+function releaseGroup(id: number) {
+    fetch(`${backend}/api/shs/admin/pairs/id/${id}/release`, {
+        method: 'PUT',
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+        },
+    })
+        .then((response: Response) => {
+            if (response.status === 200) {
+                location.reload();
+            } else {
+                alert('Beim Freigeben ist ein Fehler aufgetreten.');
+            }
+        })
+        .catch((e: any) => {
+            console.error(e);
+            alert('Beim Freigeben ist ein Fehler aufgetreten.');
+        });
 }
