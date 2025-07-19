@@ -111,9 +111,23 @@ public class ShsAdminResource {
     @PutMapping("/pairs/id/{id}/release")
     public ResponseEntity<?> releaseGroup(@PathVariable("id") Long id) {
         if (studentService.releaseGroup(id)) {
+            // TODO marks for email send
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/pairs/id/{id}")
+    public ResponseEntity<?> deleteGroup(@PathVariable("id") Long id) {
+        try {
+            if (studentService.deleteGroup(id)) {
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(403).body(e.getMessage());
         }
     }
 }

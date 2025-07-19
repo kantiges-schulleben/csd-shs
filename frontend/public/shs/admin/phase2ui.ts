@@ -157,6 +157,14 @@ function loadSingle() {
                                               'searchButton',
                                               'dangerButton',
                                           ],
+                                          handler: [
+                                              {
+                                                  type: 'click',
+                                                  id: 'clickDeleteGroup',
+                                                  arguments: '',
+                                                  body: `deleteGroup(${pair.id})`,
+                                              },
+                                          ],
                                       },
                                       {
                                           tag: 'button',
@@ -240,6 +248,14 @@ function loadGroup() {
                                           classes: [
                                               'searchButton',
                                               'dangerButton',
+                                          ],
+                                          handler: [
+                                              {
+                                                  type: 'click',
+                                                  id: 'clickDeleteGroup',
+                                                  arguments: '',
+                                                  body: `deleteGroup(${pair.id})`,
+                                              },
                                           ],
                                       },
                                       {
@@ -386,7 +402,7 @@ function releaseGroup(id: number) {
     })
         .then((response: Response) => {
             if (response.status === 200) {
-                location.reload();
+                reloadPhase2Ui();
             } else {
                 alert('Beim Freigeben ist ein Fehler aufgetreten.');
             }
@@ -395,4 +411,33 @@ function releaseGroup(id: number) {
             console.error(e);
             alert('Beim Freigeben ist ein Fehler aufgetreten.');
         });
+}
+
+function deleteGroup(id: number) {
+    fetch(`${backend}/api/shs/admin/pairs/id/${id}`, {
+        method: 'DELETE',
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+        },
+    })
+        .then((response: Response) => {
+            if (response.status === 204) {
+                reloadPhase2Ui();
+            } else {
+                alert('Beim Löschen ist ein Fehler aufgetreten.');
+            }
+        })
+        .catch((e: any) => {
+            console.error(e);
+            alert('Beim Löschen ist ein Fehler aufgetreten.');
+        });
+}
+
+function reloadPhase2Ui() {
+    const content: edomElement = edom.findById('content')!;
+    while (content.children.length > 0) {
+        content.children[0].delete();
+    }
+
+    renderPhase2Ui();
 }

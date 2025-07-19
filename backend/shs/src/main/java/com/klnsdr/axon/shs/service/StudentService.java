@@ -111,6 +111,16 @@ public class StudentService {
         return true;
     }
 
+    public boolean deleteGroup(Long id) {
+        final Optional<Group> deletedGroup = groupService.deleteById(id);
+        if (deletedGroup.isEmpty()) {
+            logger.warn("Group with ID {} not found", id);
+            return false;
+        }
+
+        return true;
+    }
+
     public boolean resetData() {
         try {
 //            studentRepository.deleteAll();

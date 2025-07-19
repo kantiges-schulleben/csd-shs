@@ -40,4 +40,22 @@ public class GroupService {
     public Optional<Group> findById(Long id) {
         return groupRepository.findById(id);
     }
+
+    public Optional<Group> deleteById(Long id) {
+        final Optional<Group> group = groupRepository.findById(id);
+
+        if (group.isEmpty()) {
+            return Optional.empty();
+        }
+
+        final Group existingGroup = group.get();
+        if (existingGroup.isReleased()) {
+            throw new IllegalStateException("Cannot delete a released group.");
+        }
+
+        existingGroup.setStudents(null);
+        groupRepository.save(existingGroup);
+        groupRepository.delete(existingGroup);
+        return Optional.of(existingGroup);
+    }
 }
