@@ -13,10 +13,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
@@ -261,7 +258,6 @@ public class StudentService {
 
         doSingle(single);
         doGroup(group);
-        doWithout(without);
     }
 
     private void doSingle(List<Map<String, Object>> data) {
@@ -272,7 +268,7 @@ public class StudentService {
             group.setReleased(false);
             group.setTeacher(lockedStudentRepository.findById(Long.parseLong((String) pair.get("accountID")))
                     .orElseThrow(() -> new IllegalArgumentException("Teacher not found for ID: " + pair.get("accountID"))));
-            final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String) pair.get("accountID")))
+            final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String)((Map<String, Object>) pair.get("partner")).get("accountID")))
                     .orElseThrow(() -> new IllegalArgumentException("Student not found for ID: " + pair.get("accountID")));
             group.setStudents(List.of(student));
 
@@ -281,10 +277,27 @@ public class StudentService {
     }
 
     private void doGroup(List<Map<String, Object>> data) {
+        // TODO more validation
+        data.forEach(pair -> {
+            final Group group = new Group();
+            group.setSubject((String) pair.get("facher"));
+            group.setReleased(false);
+            group.setTeacher(lockedStudentRepository.findById(Long.parseLong((String) pair.get("accountID")))
+                    .orElseThrow(() -> new IllegalArgumentException("Teacher not found for ID: " + pair.get("accountID"))));
 
-    }
+            final List<LockedEnrolledStudentEntity> students = new ArrayList<>();
+            final int studentCount = Integer.parseInt((String) pair.get("anzahlPartner"));
 
-    private void doWithout(List<Map<String, Object>> data) {
+            final Map<String, Object> studentData = (Map<String, Object>) pair.get("partner");
+            for (int i = 1; i <= studentCount; i++) {
+                final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String)((Map<String, Object>) studentData.get(Integer.toString(i))).get("accountID")))
+                        .orElseThrow(() -> new IllegalArgumentException("Student not found for ID: " + studentData.get("accountID")));
+                students.add(student);
+            }
 
+            group.setStudents(students);
+
+            groupService.save(group);
+        });
     }
 }
