@@ -1,18 +1,21 @@
 package com.klnsdr.axon.shs.service;
 
-import com.klnsdr.axon.shs.entity.AnalysisResultEntity;
-import com.klnsdr.axon.shs.entity.EnrolledStudentEntity;
-import com.klnsdr.axon.shs.entity.Student;
-import com.klnsdr.axon.shs.entity.Teacher;
-import jakarta.persistence.EntityManager;
-import jakarta.transaction.Transactional;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.klnsdr.axon.shs.entity.*;
+import com.klnsdr.axon.shs.entity.analysis.AnalysisResultEntity;
+import com.klnsdr.axon.shs.entity.analysis.legacy.Group;
+import com.klnsdr.axon.shs.service.legacy.GroupRepository;
+import com.klnsdr.axon.shs.service.legacy.GroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -23,17 +26,20 @@ public class StudentService {
     private final LockedStudentRepository lockedStudentRepository;
     private final CopyStudentDataHelper copyStudentDataHelper;
     private final AnalysisResultRepository analysisResultRepository;
+    private final GroupService groupService;
 
     public StudentService(
             StudentRepository studentRepository,
             LockedStudentRepository lockedStudentRepository,
             CopyStudentDataHelper copyStudentDataHelper,
-            AnalysisResultRepository analysisResultRepository
+            AnalysisResultRepository analysisResultRepository,
+            GroupService groupService
     ) {
         this.studentRepository = studentRepository;
         this.lockedStudentRepository = lockedStudentRepository;
         this.copyStudentDataHelper = copyStudentDataHelper;
         this.analysisResultRepository = analysisResultRepository;
+        this.groupService = groupService;
     }
 
     public Teacher createTeacher(Teacher teacher) {
@@ -92,6 +98,18 @@ public class StudentService {
             return;
         }
 
+        try {
+            runAnalysisInternal();
+        } catch (Exception e) {
+            logger.error("Unexpected error during analysis", e);
+            writeAnalysisStatusToDatabase(false, "Unexpected error: " + e.getMessage());
+            running.set(false);
+        }
+    }
+
+    private void runAnalysisInternal() {
+        groupService.deleteAllGroupsAndStudents();
+
         final boolean didClear = copyStudentDataHelper.clearLockedStudentsTable();
         if (!didClear) {
             logger.error("Failed to clear locked students table");
@@ -104,6 +122,36 @@ public class StudentService {
         if (!didCopy) {
             logger.error("Failed to copy students table");
             writeAnalysisStatusToDatabase(false, "Failed to copy students table");
+            running.set(false);
+            return;
+        }
+
+        final List<LockedEnrolledStudentEntity> allEnrolledStudents = lockedStudentRepository.findAll();
+        final String studentsAsParam = "[" + allEnrolledStudents.stream()
+                .map(LockedEnrolledStudentEntity::asJson)
+                .reduce((a, b) -> a + "," + b)
+                .orElse("") + "]";
+
+        if (studentsAsParam.equals("[]")) {
+            logger.warn("No students found for analysis");
+            writeAnalysisStatusToDatabase(false, "No students found for analysis");
+            running.set(false);
+            return;
+        }
+
+        final Pair<Boolean, String> result = new AnalysisScriptRunner().runAnalysisScript(studentsAsParam);
+        if (!result.getFirst()) {
+            logger.error("Analysis script failed: {}", result.getSecond());
+            writeAnalysisStatusToDatabase(false, result.getSecond().length() < 20 ? result.getSecond() : "Ein Fehler beim Ausführen des Skripts ist aufgetreten");
+            running.set(false);
+            return;
+        }
+
+        try {
+            parseAndStoreScriptOutput(result.getSecond());
+        } catch (Exception e) {
+            logger.error("Failed to parse and store script output", e);
+            writeAnalysisStatusToDatabase(false, "Failed to parse and store script output: " + e.getMessage());
             running.set(false);
             return;
         }
@@ -187,5 +235,56 @@ public class StudentService {
         teacher.setPhoneNumber(entity.getPhoneNumber());
         teacher.setTargetGrade(entity.getTargetGrade());
         return teacher;
+    }
+
+    private void parseAndStoreScriptOutput(String output) throws JsonProcessingException {
+        @SuppressWarnings("unchecked")
+        final HashMap<String, Object> resultMap = new ObjectMapper().readValue(output, HashMap.class);
+
+        if (!(
+                resultMap.containsKey("einzel") &&
+                resultMap.containsKey("gruppe") &&
+                resultMap.containsKey("ohne") &&
+                resultMap.get("einzel") instanceof List &&
+                resultMap.get("gruppe") instanceof List &&
+                resultMap.get("ohne") instanceof List
+        )) {
+            logger.error("Script output does not contain expected keys: {}", resultMap.keySet());
+            throw new IllegalArgumentException("Invalid script output format");
+        }
+        @SuppressWarnings("unchecked")
+        final List<Map<String, Object>> single = (List<Map<String, Object>>) resultMap.get("einzel");
+        @SuppressWarnings("unchecked")
+        final List<Map<String, Object>> group = (List<Map<String, Object>>) resultMap.get("gruppe");
+        @SuppressWarnings("unchecked")
+        final List<Map<String, Object>> without = (List<Map<String, Object>>) resultMap.get("ohne");
+
+        doSingle(single);
+        doGroup(group);
+        doWithout(without);
+    }
+
+    private void doSingle(List<Map<String, Object>> data) {
+        // TODO more validation
+        data.forEach(pair -> {
+            final Group group = new Group();
+            group.setSubject((String) pair.get("facher"));
+            group.setReleased(false);
+            group.setTeacher(lockedStudentRepository.findById(Long.parseLong((String) pair.get("accountID")))
+                    .orElseThrow(() -> new IllegalArgumentException("Teacher not found for ID: " + pair.get("accountID"))));
+            final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String) pair.get("accountID")))
+                    .orElseThrow(() -> new IllegalArgumentException("Student not found for ID: " + pair.get("accountID")));
+            group.setStudents(List.of(student));
+
+            groupService.save(group);
+        });
+    }
+
+    private void doGroup(List<Map<String, Object>> data) {
+
+    }
+
+    private void doWithout(List<Map<String, Object>> data) {
+
     }
 }

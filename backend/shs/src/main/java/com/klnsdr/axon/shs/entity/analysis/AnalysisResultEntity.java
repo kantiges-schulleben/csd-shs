@@ -1,4 +1,4 @@
-package com.klnsdr.axon.shs.entity;
+package com.klnsdr.axon.shs.entity.analysis;
 
 import jakarta.persistence.*;
 import lombok.Getter;
