@@ -27,4 +27,12 @@ public class GroupService {
         groupRepository.saveAll(groups);
         groupRepository.deleteAll();
     }
+
+    public List<Group> getSinglePairs() {
+        return groupRepository.getSinglePairs();
+    }
+
+    public List<Group> getGroupPairs() {
+        return groupRepository.getGroupPairs();
+    }
 }

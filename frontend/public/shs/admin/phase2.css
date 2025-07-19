@@ -1,0 +1,61 @@
+h1 {
+  margin-top: 5px;
+}
+
+.dangerButton {
+    background-color: tomato;
+}
+
+.pairCard {
+    border: 1px solid #16cc68;
+    border-radius: 5px;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+}
+
+.cardOutput {
+  display: flex;
+}
+
+.buttonBar {
+  display: flex;
+  justify-content: center;
+}
+
+.p2 table {
+  border-collapse: collapse;
+}
+
+.p2 td:first-child {
+  border-right: 1px solid #fcfcfc;
+}
+
+.p2 tr {
+    vertical-align: text-top;
+    text-align: center;
+}
+
+.p2 tr:nth-child(even) {
+    background-color: #272727;
+}
+
+li {
+    list-style: none;
+    font-size: 18px;
+}
+
+.pairCard:hover {
+    background-color: #16cc68;
+}
+
+.pairCard:hover button {
+    background-color: #323232;
+}
+
+.pairCard:hover .dangerButton {
+    background-color: tomato;
+}

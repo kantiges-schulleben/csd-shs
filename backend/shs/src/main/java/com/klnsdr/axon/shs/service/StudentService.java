@@ -3,9 +3,8 @@ package com.klnsdr.axon.shs.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.klnsdr.axon.shs.entity.*;
-import com.klnsdr.axon.shs.entity.analysis.AnalysisResultEntity;
+import com.klnsdr.axon.shs.entity.analysis.AnalysisConfig;
 import com.klnsdr.axon.shs.entity.analysis.legacy.Group;
-import com.klnsdr.axon.shs.service.legacy.GroupRepository;
 import com.klnsdr.axon.shs.service.legacy.GroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,21 +21,22 @@ public class StudentService {
     private final StudentRepository studentRepository;
     private final LockedStudentRepository lockedStudentRepository;
     private final CopyStudentDataHelper copyStudentDataHelper;
-    private final AnalysisResultRepository analysisResultRepository;
+    private final AnalysisConfigService analysisConfigService;
     private final GroupService groupService;
 
     public StudentService(
             StudentRepository studentRepository,
             LockedStudentRepository lockedStudentRepository,
             CopyStudentDataHelper copyStudentDataHelper,
-            AnalysisResultRepository analysisResultRepository,
-            GroupService groupService
+            GroupService groupService,
+            AnalysisConfigService analysisConfigService
+
     ) {
         this.studentRepository = studentRepository;
         this.lockedStudentRepository = lockedStudentRepository;
         this.copyStudentDataHelper = copyStudentDataHelper;
-        this.analysisResultRepository = analysisResultRepository;
         this.groupService = groupService;
+        this.analysisConfigService = analysisConfigService;
     }
 
     public Teacher createTeacher(Teacher teacher) {
@@ -86,6 +86,41 @@ public class StudentService {
         return entityToDelete;
     }
 
+    public List<Group> getSinglePairs() {
+        return groupService.getSinglePairs();
+    }
+
+    public List<Group> getGroupPairs() {
+        return groupService.getGroupPairs();
+    }
+
+    public List<LockedEnrolledStudentEntity> getWithoutPartner() {
+        return lockedStudentRepository.getWithoutPartner();
+    }
+
+    public boolean resetData() {
+        try {
+//            studentRepository.deleteAll();
+            groupService.deleteAllGroupsAndStudents();
+
+            final boolean didClear = copyStudentDataHelper.clearLockedStudentsTable();
+            if (!didClear) {
+                logger.error("Failed to clear locked students table");
+            }
+
+            final boolean didCopy = copyStudentDataHelper.copyStudentsTable();
+            if (!didCopy) {
+                logger.error("Failed to copy students table");
+            }
+
+            analysisConfigService.reset();
+        } catch (Exception e) {
+            logger.error("Unexpected error during data reset", e);
+            return false;
+        }
+        return true;
+    }
+
     private final AtomicBoolean running = new AtomicBoolean(false);
 
     @Async
@@ -97,6 +132,7 @@ public class StudentService {
 
         try {
             runAnalysisInternal();
+            analysisConfigService.setPhaseTwo(true);
         } catch (Exception e) {
             logger.error("Unexpected error during analysis", e);
             writeAnalysisStatusToDatabase(false, "Unexpected error: " + e.getMessage());
@@ -157,20 +193,8 @@ public class StudentService {
         running.set(false);
     }
 
-    public Pair<Boolean, String> getAnalysisStatus() {
-        final List<AnalysisResultEntity> results = analysisResultRepository.findAll();
-        if (results.isEmpty()) {
-            return Pair.of(false, "No analysis results found");
-        }
-        final AnalysisResultEntity latestResult = results.getLast();
-        return Pair.of(latestResult.isWasSuccessful(), latestResult.getErrorMessage());
-    }
-
     private void writeAnalysisStatusToDatabase(boolean status, String message) {
-        final AnalysisResultEntity result = new AnalysisResultEntity();
-        result.setWasSuccessful(status);
-        result.setErrorMessage(message);
-        analysisResultRepository.save(result);
+        analysisConfigService.setResult(status, message);
     }
 
     public boolean isAnalysisRunning() {
@@ -253,8 +277,6 @@ public class StudentService {
         final List<Map<String, Object>> single = (List<Map<String, Object>>) resultMap.get("einzel");
         @SuppressWarnings("unchecked")
         final List<Map<String, Object>> group = (List<Map<String, Object>>) resultMap.get("gruppe");
-        @SuppressWarnings("unchecked")
-        final List<Map<String, Object>> without = (List<Map<String, Object>>) resultMap.get("ohne");
 
         doSingle(single);
         doGroup(group);
