@@ -542,7 +542,7 @@ function saveDetails(userID: string) {
         edom.findById('selectSubject')?.element as HTMLSelectElement
     ).value;
 
-    userdata['isGroup'] =
+    userdata['group'] =
         (edom.findById('selectIsGroup')?.element as HTMLSelectElement).value === 'Gruppennachhilfe';
 
     userdata['teacher'] =

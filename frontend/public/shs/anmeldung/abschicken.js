@@ -548,7 +548,7 @@ function doEnrollStudent() {
       mail: mail.value,
       subject: fach.innerText,
       grade: parseInt(klasse.innerText),
-      isGroup: anzahl == 0,
+      group: anzahl == 0,
       phoneNumber: handy.value
     };
   console.log(data);
@@ -579,7 +579,7 @@ function doEnrollTeacher() {
       mail: mail.value,
       subject: fach.innerText,
       grade: parseInt(klasse.innerText),
-      isGroup: anzahl == 0,
+      group: anzahl == 0,
       phoneNumber: handy.value,
       targetGrade : parseInt(klassenstufen.innerText)
     };
