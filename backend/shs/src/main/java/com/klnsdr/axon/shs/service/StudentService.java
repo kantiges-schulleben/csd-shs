@@ -189,8 +189,9 @@ public class StudentService {
         }
 
         try {
-            runAnalysisInternal();
-            analysisConfigService.setPhaseTwo(true);
+            if (runAnalysisInternal()) {
+                analysisConfigService.setPhaseTwo(true);
+            }
         } catch (Exception e) {
             logger.error("Unexpected error during analysis", e);
             writeAnalysisStatusToDatabase(false, "Unexpected error: " + e.getMessage());
@@ -198,7 +199,7 @@ public class StudentService {
         }
     }
 
-    private void runAnalysisInternal() {
+    private boolean runAnalysisInternal() {
         groupService.deleteAllGroupsAndStudents();
 
         final boolean didClear = copyStudentDataHelper.clearLockedStudentsTable();
@@ -206,7 +207,7 @@ public class StudentService {
             logger.error("Failed to clear locked students table");
             writeAnalysisStatusToDatabase(false, "Failed to clear locked students table");
             running.set(false);
-            return;
+            return false;
         }
 
         final boolean didCopy = copyStudentDataHelper.copyStudentsTable();
@@ -214,7 +215,7 @@ public class StudentService {
             logger.error("Failed to copy students table");
             writeAnalysisStatusToDatabase(false, "Failed to copy students table");
             running.set(false);
-            return;
+            return false;
         }
 
         final List<LockedEnrolledStudentEntity> allEnrolledStudents = lockedStudentRepository.findAll();
@@ -227,7 +228,7 @@ public class StudentService {
             logger.warn("No students found for analysis");
             writeAnalysisStatusToDatabase(false, "No students found for analysis");
             running.set(false);
-            return;
+            return false;
         }
 
         final Pair<Boolean, String> result = new AnalysisScriptRunner().runAnalysisScript(studentsAsParam);
@@ -235,7 +236,7 @@ public class StudentService {
             logger.error("Analysis script failed: {}", result.getSecond());
             writeAnalysisStatusToDatabase(false, result.getSecond().length() < 20 ? result.getSecond() : "Ein Fehler beim Ausführen des Skripts ist aufgetreten");
             running.set(false);
-            return;
+            return false;
         }
 
         try {
@@ -244,11 +245,12 @@ public class StudentService {
             logger.error("Failed to parse and store script output", e);
             writeAnalysisStatusToDatabase(false, "Failed to parse and store script output: " + e.getMessage());
             running.set(false);
-            return;
+            return false;
         }
 
         writeAnalysisStatusToDatabase(true, "");
         running.set(false);
+        return true;
     }
 
     private void writeAnalysisStatusToDatabase(boolean status, String message) {
