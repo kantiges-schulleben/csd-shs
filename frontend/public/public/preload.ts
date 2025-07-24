@@ -14,7 +14,7 @@ function preload() {
                     ${/*TODO css zentralisieren & style hier entfernen*/ ''}
                     <style>
                     .isLoggedIn {
-                        box-shadow: 0 0 1px 1px #16cc68;
+                        box-shadow: 0 0 1px 1px var(--secondary-color);
                         border-radius: 50px;
                         padding: 10px 30px 10px 30px !important;
                         transform:scale(1.02);
