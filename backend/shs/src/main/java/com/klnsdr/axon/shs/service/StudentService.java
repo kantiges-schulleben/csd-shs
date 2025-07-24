@@ -135,6 +135,27 @@ public class StudentService {
         return lockedStudentRepository.findBySubjectAndIsTeacherIsTrue(subject);
     }
 
+    public Group createGroup(Long teacherId, Long studentId, String subject) {
+        final Optional<LockedEnrolledStudentEntity> teacherOpt = lockedStudentRepository.findById(teacherId);
+        if (teacherOpt.isEmpty() || !teacherOpt.get().isTeacher()) {
+            throw new IllegalArgumentException("Invalid teacher ID: " + teacherId);
+        }
+
+        final Optional<LockedEnrolledStudentEntity> studentOpt = lockedStudentRepository.findById(studentId);
+        if (studentOpt.isEmpty() || studentOpt.get().isTeacher()) {
+            throw new IllegalArgumentException("Invalid student ID: " + studentId);
+        }
+
+        final Group group = new Group();
+        group.setTeacher(teacherOpt.get());
+        group.setStudents(List.of(studentOpt.get()));
+        group.setSubject(subject);
+        group.setReleased(false);
+
+        groupService.save(group);
+        return group;
+    }
+
     public boolean resetData() {
         try {
 //            studentRepository.deleteAll();

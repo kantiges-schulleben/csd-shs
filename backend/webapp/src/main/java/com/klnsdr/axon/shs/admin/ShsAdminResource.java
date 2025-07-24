@@ -10,8 +10,10 @@ import com.klnsdr.axon.shs.entity.analysis.legacy.Group;
 import com.klnsdr.axon.shs.service.AnalysisConfigService;
 import com.klnsdr.axon.shs.service.StudentService;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -138,6 +140,15 @@ public class ShsAdminResource {
             }
         } catch (IllegalStateException e) {
             return ResponseEntity.status(403).body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/pairs")
+    public Group createGroup(@RequestBody CreateGroupDTO createGroupDTO) {
+        try {
+            return studentService.createGroup(createGroupDTO.getTeacherId(), createGroupDTO.getStudentId(), createGroupDTO.getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
     }
 }

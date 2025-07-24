@@ -557,6 +557,14 @@ function openConnectPopup() {
                         tag: 'button',
                         classes: ['searchButton'],
                         text: 'ok',
+                        handler: [
+                            {
+                                type: 'click',
+                                id: 'clickSaveGroup',
+                                arguments: 'self',
+                                body: 'saveGroup(self)',
+                            },
+                        ],
                     },
                 ],
             },
@@ -603,20 +611,14 @@ function loadStudentsForSubject(subject: string) {
                 'selectStudentConnect'
             )!;
 
-            edom.fromTemplate(
-                students
-                    .map(
-                        (student: Student) =>
-                            student.name + ' ' + student.sureName
-                    )
-                    .map((name: string) => {
-                        return {
-                            tag: 'option',
-                            text: name,
-                        };
-                    }),
-                selStudents
-            );
+            students.forEach((student: Student) => {
+                const option: edomElement = edom.newElement('option');
+                option.setText(student.name + ' ' + student.sureName);
+                (option.element as HTMLOptionElement).value =
+                    student.id.toString();
+
+                selStudents.addChild(option);
+            });
         })
         .catch((e: any) => {
             console.error(e);
@@ -639,25 +641,56 @@ function loadTeachersForSubject(subject: string) {
             }
             return response.json();
         })
-        .then((students: Student[]) => {
+        .then((teachers: Student[]) => {
             const selTeachers: edomElement = edom.findById(
                 'selectTeacherConnect'
             )!;
 
-            edom.fromTemplate(
-                students
-                    .map(
-                        (student: Student) =>
-                            student.name + ' ' + student.sureName
-                    )
-                    .map((name: string) => {
-                        return {
-                            tag: 'option',
-                            text: name,
-                        };
-                    }),
-                selTeachers
-            );
+            teachers.forEach((student: Student) => {
+                const option: edomElement = edom.newElement('option');
+                option.setText(student.name + ' ' + student.sureName);
+                (option.element as HTMLOptionElement).value =
+                    student.id.toString();
+
+                selTeachers.addChild(option);
+            });
+        })
+        .catch((e: any) => {
+            console.error(e);
+        });
+}
+
+function saveGroup(self: edomElement) {
+    const selTeacher: edomElement = edom.findById('selectTeacherConnect')!;
+    const selStudent: edomElement = edom.findById('selectStudentConnect')!;
+    const selSubject: edomElement = edom.findById('selectSubjectConnect')!;
+
+    const subject: string = (selSubject.element as HTMLSelectElement).value;
+    const studentId: string = (selStudent.element as HTMLSelectElement).value;
+    const teacherId: string = (selTeacher.element as HTMLSelectElement).value;
+
+    fetch(`${backend}/api/shs/admin/pairs`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            teacherId: parseInt(teacherId),
+            studentId: parseInt(studentId),
+            subject: subject,
+        }),
+    })
+        .then((response: Response) => {
+            closePopup(self);
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status} ${
+                        response.statusText
+                    } - ${response.text()}`
+                );
+            }
+            reloadPhase2Ui();
         })
         .catch((e: any) => {
             console.error(e);
