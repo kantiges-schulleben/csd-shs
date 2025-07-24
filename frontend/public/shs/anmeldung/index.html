@@ -4,6 +4,8 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="/shs/anmeldung/anmeldung.css" />
+        <link rel="stylesheet" href="/home.css" />
+        <link rel="stylesheet" href="/public/root.css" />
 
         <link
             rel="stylesheet"
@@ -40,7 +42,7 @@
                         class="nachhilfe"
                         onclick="login()"
                     >
-                        Lehrer*in
+                        JT
                     </button>
                     <button
                         type="button"
@@ -88,20 +90,22 @@
                     <label type="text" class="input-label" name="nachhilfe"
                         >Form der Nachhilfe</label
                     >
-                    <br />
-                    <input
-                        type="radio"
-                        class="box"
-                        name="box1"
-                        id="one1"
-                    /><span id="box"> Einzelnachhilfe</span>
-                    <br />
-                    <input
-                        type="radio"
-                        class="box"
-                        name="box1"
-                        id="multiple1"
-                    /><span id="box"> Gruppennachhilfe</span>
+                    <div>
+                        <input
+                            type="radio"
+                            class="box"
+                            name="box1"
+                            id="one1"
+                        /><span id="box"> Einzelnachhilfe</span>
+                    </div>
+                    <div>
+                        <input
+                            type="radio"
+                            class="box"
+                            name="box1"
+                            id="multiple1"
+                        /><span id="box"> Gruppennachhilfe</span>
+                    </div>
                     <!--- <input type="text" class="input-field" name="klassenstufe" placeholder="Klassenstufe" required>-->
                     <div class="klassen">
                         <!--container-->
@@ -373,7 +377,6 @@
                             </div>
                         </div>
                     </div>
-                    <br />
                     <div class="klassen">
                         <div class="select-box oben-abstand">
                             <div class="options-container">
@@ -605,7 +608,6 @@
                             </div>
                         </div>
                     </div>
-                    <br />
                     <div class="klassen">
                         <!--container-->
                         <div class="select-box oben-abstand">
@@ -704,17 +706,19 @@
                     <br />
 
                     <!--<input type="text" class="input-field" name="bemerkungen" placeholder="Bemerkungen">-->
-                    <input
-                        type="checkbox"
-                        class="chech-box"
-                        id="datenschutz1"
-                    /><span id="datenschutz"
-                        >Ich stimme der
-                        <a id="datenverlinkung" href="/general/datenschutz"
-                            >Datenschutzverordnung</a
-                        >
-                        zu
-                    </span>
+                    <div>
+                        <input
+                            type="checkbox"
+                            class="chech-box"
+                            id="datenschutz1"
+                        /><span id="datenschutz"
+                            >Ich stimme der
+                            <a id="datenverlinkung" href="/general/datenschutz"
+                                >Datenschutzverordnung</a
+                            >
+                            zu
+                        </span>
+                    </div>
 
                     <button type="button" id="save1" class="anmeldungshs">
                         Anmeldung als Nachhilfelehrer*in
@@ -753,20 +757,22 @@
                     <label type="text" class="input-label" name="nachhilfe"
                         >Form der Nachhilfe</label
                     >
-                    <br />
-                    <input
-                        type="radio"
-                        class="box"
-                        name="box2"
-                        id="one2"
-                    /><span id="box"> Einzelnachhilfe</span>
-                    <br />
-                    <input
-                        type="radio"
-                        class="box"
-                        name="box2"
-                        id="multiple2"
-                    /><span id="box"> Gruppennachhilfe</span>
+                    <div>
+                        <input
+                            type="radio"
+                            class="box"
+                            name="box2"
+                            id="one2"
+                        /><span id="box"> Einzelnachhilfe</span>
+                    </div>
+                    <div>
+                        <input
+                            type="radio"
+                            class="box"
+                            name="box2"
+                            id="multiple2"
+                        /><span id="box"> Gruppennachhilfe</span>
+                    </div>
 
                     <div class="klassen">
                         <!--container-->
@@ -1370,17 +1376,19 @@
                     <br />
 
                     <!--<input type="text" class="input-field" name="bemerkungen" placeholder="Bemerkungen" >-->
-                    <input
-                        type="checkbox"
-                        class="chech-box"
-                        id="datenschutz2"
-                    /><span id="datenschutz"
-                        >Ich stimme der
-                        <a id="datenverlinkung" href="/general/datenschutz"
-                            >Datenschutzverordnung</a
-                        >
-                        zu
-                    </span>
+                    <div>
+                        <input
+                            type="checkbox"
+                            class="chech-box"
+                            id="datenschutz2"
+                        /><span id="datenschutz"
+                            >Ich stimme der
+                            <a id="datenverlinkung" href="/general/datenschutz"
+                                >Datenschutzverordnung</a
+                            >
+                            zu
+                        </span>
+                    </div>
                     <button type="button" id="save2" class="anmeldungshs">
                         Anmeldung als Nachhilfeschüler*in
                     </button>

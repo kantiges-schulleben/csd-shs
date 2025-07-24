@@ -575,7 +575,7 @@ function doEnrollStudent() {
 function doEnrollTeacher() {
   const data = {
       name: vorname.value,
-      surename: nachname.value, // FIXME gibt immer null zurück
+      sureName: nachname.value,
       mail: mail.value,
       subject: fach.innerText,
       grade: parseInt(klasse.innerText),
