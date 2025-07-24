@@ -61,6 +61,16 @@ public class ShsAdminResource {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/students/by-subject")
+    public List<LockedEnrolledStudentEntity> getStudentsBySubject(@RequestParam("s") String subject) {
+        return studentService.getStudentsBySubject(subject);
+    }
+
+    @GetMapping("/teachers/by-subject")
+    public List<LockedEnrolledStudentEntity> getTeachersBySubject(@RequestParam("s") String subject) {
+        return studentService.getTeachersBySubject(subject);
+    }
+
     @PostMapping("/start")
     public ResponseEntity<?> startAnalysis() {
         studentService.runAnalysis();

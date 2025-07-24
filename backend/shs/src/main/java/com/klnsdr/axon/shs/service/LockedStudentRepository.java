@@ -17,4 +17,7 @@ public interface LockedStudentRepository extends JpaRepository<LockedEnrolledStu
        )
        """)
     List<LockedEnrolledStudentEntity> getWithoutPartner();
+
+    List<LockedEnrolledStudentEntity> findBySubjectAndIsTeacherIsFalse(String subject);
+    List<LockedEnrolledStudentEntity> findBySubjectAndIsTeacherIsTrue(String subject);
 }

@@ -330,6 +330,14 @@ function loadWithout() {
                         tag: 'button',
                         text: 'verknüpfen',
                         classes: ['searchButton'],
+                        handler: [
+                            {
+                                type: 'click',
+                                id: 'clickOpenPopup',
+                                arguments: '',
+                                body: 'openConnectPopup()',
+                            },
+                        ],
                     },
                     {
                         tag: 'table',
@@ -440,4 +448,218 @@ function reloadPhase2Ui() {
     }
 
     renderPhase2Ui();
+}
+
+function openConnectPopup() {
+    popup('', {
+        tag: 'div',
+        children: [
+            {
+                tag: 'div',
+                classes: ['popupConnectBody'],
+                id: 'actualContent',
+                children: [
+                    {
+                        tag: 'p',
+                        text: 'Fach:',
+                    },
+                    {
+                        tag: 'select',
+                        classes: ['outputDetails'],
+                        id: 'selectSubjectConnect',
+                        children: [
+                            // TODO use file for constant
+                            '',
+                            'Deutsch',
+                            'Englisch',
+                            'Französisch',
+                            'Russisch',
+                            'naturwissenschaftliche Profil',
+                            'künstlerisches Profil',
+                            'gesellschaftliches Profil',
+                            'Mathe',
+                            'Informatik',
+                            'Biologie',
+                            'Chemie',
+                            'Physik',
+                            'Geschichte',
+                            'Geografie',
+                            'Ethik',
+                            'Religion',
+                            'Kunst',
+                            'Musik',
+                            'Technik und Computer',
+                            'GRW',
+                            'Bionik',
+                            'Philosophie',
+                        ].map((fach: string) => {
+                            return {
+                                tag: 'option',
+                                text: fach,
+                            };
+                        }),
+                        handler: [
+                            {
+                                type: 'change',
+                                id: 'changeLoadStudentsAndTeachers',
+                                arguments: 'self',
+                                body: 'loadUsers(self)',
+                            },
+                        ],
+                    },
+                    {
+                        tag: 'div',
+                    },
+                    {
+                        tag: 'p',
+                        text: 'Lehrer*in:',
+                    },
+                    {
+                        tag: 'select',
+                        classes: ['outputDetails'],
+                        id: 'selectTeacherConnect',
+                    },
+                    {
+                        tag: 'div',
+                    },
+                    {
+                        tag: 'p',
+                        text: 'Schüler*in:',
+                    },
+                    {
+                        tag: 'select',
+                        classes: ['outputDetails'],
+                        id: 'selectStudentConnect',
+                    },
+                    {
+                        tag: 'button',
+                        text: '+',
+                    },
+                ],
+            },
+            {
+                tag: 'div',
+                children: [
+                    {
+                        tag: 'button',
+                        classes: ['searchButton', 'dangerButton'],
+                        text: 'abbrechen',
+                        handler: [
+                            {
+                                type: 'click',
+                                id: 'clickClosePopup',
+                                arguments: 'self',
+                                body: 'closePopup(self)',
+                            },
+                        ],
+                    },
+                    {
+                        tag: 'button',
+                        classes: ['searchButton'],
+                        text: 'ok',
+                    },
+                ],
+            },
+        ],
+    });
+}
+
+function loadUsers(self: edomElement) {
+    const subject: string = (self.element as HTMLSelectElement).value;
+    clearSelects();
+
+    loadStudentsForSubject(subject);
+    loadTeachersForSubject(subject);
+}
+
+function clearSelects() {
+    const selTeacher: edomElement = edom.findById('selectTeacherConnect')!;
+    const selStudents: edomElement = edom.findById('selectStudentConnect')!;
+    (selTeacher.element as HTMLSelectElement).innerHTML = '';
+    (selStudents.element as HTMLSelectElement).innerHTML = '';
+
+    (selTeacher.element as HTMLSelectElement).value = '';
+    (selStudents.element as HTMLSelectElement).value = '';
+}
+
+function loadStudentsForSubject(subject: string) {
+    fetch(`${backend}/api/shs/admin/students/by-subject?s=${subject}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+        },
+    })
+        .then((response: Response) => {
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status} ${
+                        response.statusText
+                    } - ${response.text()}`
+                );
+            }
+            return response.json();
+        })
+        .then((students: Student[]) => {
+            const selStudents: edomElement = edom.findById(
+                'selectStudentConnect'
+            )!;
+
+            edom.fromTemplate(
+                students
+                    .map(
+                        (student: Student) =>
+                            student.name + ' ' + student.sureName
+                    )
+                    .map((name: string) => {
+                        return {
+                            tag: 'option',
+                            text: name,
+                        };
+                    }),
+                selStudents
+            );
+        })
+        .catch((e: any) => {
+            console.error(e);
+        });
+}
+
+function loadTeachersForSubject(subject: string) {
+    fetch(`${backend}/api/shs/admin/teachers/by-subject?s=${subject}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+        },
+    })
+        .then((response: Response) => {
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status} ${
+                        response.statusText
+                    } - ${response.text()}`
+                );
+            }
+            return response.json();
+        })
+        .then((students: Student[]) => {
+            const selTeachers: edomElement = edom.findById(
+                'selectTeacherConnect'
+            )!;
+
+            edom.fromTemplate(
+                students
+                    .map(
+                        (student: Student) =>
+                            student.name + ' ' + student.sureName
+                    )
+                    .map((name: string) => {
+                        return {
+                            tag: 'option',
+                            text: name,
+                        };
+                    }),
+                selTeachers
+            );
+        })
+        .catch((e: any) => {
+            console.error(e);
+        });
 }

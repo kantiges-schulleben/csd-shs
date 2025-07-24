@@ -121,6 +121,20 @@ public class StudentService {
         return true;
     }
 
+    public List<LockedEnrolledStudentEntity> getStudentsBySubject(String subject) {
+        if (subject == null || subject.isEmpty()) {
+            return List.of();
+        }
+        return lockedStudentRepository.findBySubjectAndIsTeacherIsFalse(subject);
+    }
+
+    public List<LockedEnrolledStudentEntity> getTeachersBySubject(String subject) {
+        if (subject == null || subject.isEmpty()) {
+            return List.of();
+        }
+        return lockedStudentRepository.findBySubjectAndIsTeacherIsTrue(subject);
+    }
+
     public boolean resetData() {
         try {
 //            studentRepository.deleteAll();
