@@ -126,6 +126,14 @@ function loadSingle() {
                     children: [
                         {
                             tag: 'label',
+                            text: 'Fach:',
+                        },
+                        {
+                            tag: 'label',
+                            text: pair.subject,
+                        },
+                        {
+                            tag: 'label',
                             text: 'Lehrer*in:',
                         },
                         {
@@ -214,6 +222,14 @@ function loadGroup() {
                     tag: 'div',
                     classes: ['pairCard'],
                     children: [
+                        {
+                            tag: 'label',
+                            text: 'Fach:',
+                        },
+                        {
+                            tag: 'label',
+                            text: pair.subject,
+                        },
                         {
                             tag: 'label',
                             text: 'Lehrer*in:',
