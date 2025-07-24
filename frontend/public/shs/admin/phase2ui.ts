@@ -307,20 +307,29 @@ function loadWithout() {
             const teachers: Student[] = without.filter(
                 (o: Student) => o.teacher
             );
-            const tableData: String[][] = Array.from(
+            const tableData: String[][][] = Array.from(
                 { length: Math.max(students.length, teachers.length) },
-                (_) => ['', '']
+                (_) => [
+                    ['', ''],
+                    ['', ''],
+                ]
             );
 
             for (let i = 0; i < students.length; i++) {
                 const tmp = tableData[i];
-                tmp[1] = students[i].name + ' ' + students[i].sureName;
+                tmp[1] = [
+                    students[i].name + ' ' + students[i].sureName,
+                    students[i].subject,
+                ];
                 tableData[i] = tmp;
             }
 
             for (let i = 0; i < teachers.length; i++) {
                 const tmp = tableData[i];
-                tmp[0] = teachers[i].name + ' ' + teachers[i].sureName;
+                tmp[0] = [
+                    teachers[i].name + ' ' + teachers[i].sureName,
+                    teachers[i].subject,
+                ];
                 tableData[i] = tmp;
             }
 
@@ -355,17 +364,23 @@ function loadWithout() {
                                     },
                                 ],
                             },
-                            ...tableData.map((names: String[]) => {
+                            ...tableData.map((names: String[][]) => {
                                 return {
                                     tag: 'tr',
                                     children: [
                                         {
                                             tag: 'td',
-                                            text: names[0],
+                                            text:
+                                                names[0][0] === ''
+                                                    ? ''
+                                                    : `${names[0][0]} (${names[0][1]})`,
                                         },
                                         {
                                             tag: 'td',
-                                            text: names[1],
+                                            text:
+                                                names[1][0] === ''
+                                                    ? ''
+                                                    : `${names[1][0]} (${names[1][1]})`,
                                         },
                                     ],
                                 };
