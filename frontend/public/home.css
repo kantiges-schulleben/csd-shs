@@ -24,7 +24,6 @@ a:hover {
 }
 .card {
     box-shadow: 2px 8px 14px 0px rgb(12, 12, 12);
-    border-radius: 15px;
     max-width: 360px;
     max-height: 350px;
     min-height: 350px;
@@ -138,7 +137,6 @@ header p {
 ::-webkit-scrollbar-thumb {
     opacity: 10%;
     background: var(--font-dark);
-    border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
     background: var(--font-dark);
@@ -207,7 +205,6 @@ nav {
 
 .menu-bar ul li:hover {
     background: var(--secondary-color);
-    border-radius: 50px;
     padding: 10px 30px 10px 30px;
     transform: scale(1.02);
     transform-origin: center;
@@ -221,7 +218,6 @@ nav {
     position: fixed;
     background: var(--primary-color);
     box-shadow: 2px 8px 14px 0px rgba(12, 12, 12, 0.596);
-    border-radius: 15px;
     margin-top: 10px;
     margin-left: -32px;
 }
@@ -236,7 +232,6 @@ nav {
     padding: 10px;
     border-bottom: 1px dotted var(--font-light);
     background: transparent;
-    border-radius: 0;
     text-align: center;
 }
 
@@ -368,7 +363,6 @@ a {
     }
     .menu-bar ul li:hover {
         background-color: var(--secondary-color);
-        border-radius: 50px;
         padding: 0px 30px 50px 30px;
         transform-origin: center;
         height: 300px;
@@ -387,7 +381,6 @@ a {
         background-color: var(--secondary-color);
         box-shadow: none;
         min-width: 100%;
-        border-radius: 15px;
         margin-top: 10px;
     }
     .menu-bar ul li:hover .sub-menu-1 ul {
@@ -402,7 +395,6 @@ a {
         text-align: center;
         border-bottom: 1px dotted var(--font-light);
         background: transparent;
-        border-radius: 0;
     }
     .menu-bar ul li:hover .sub-menu-1 ul li:hover {
         height: 40px;

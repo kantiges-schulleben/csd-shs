@@ -23,7 +23,6 @@ body {
 img {
     height: 100%;
     width: 100%;
-    border-radius: 15px;
 }
 .test {
     height: 150px;
@@ -48,7 +47,6 @@ section {
     -webkit-box-shadow: -2px 2px 20px 0px #00000013;
     box-shadow: -2px 2px 20px 0px #00000013;
     margin-bottom: 50px;
-    border-radius: 10px;
     text-align: center;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -90,7 +88,6 @@ section {
     -webkit-box-shadow: -2px 2px 20px 0px #00000013;
     box-shadow: -2px 2px 20px 0px #00000013;
 
-    border-radius: 10px;
 }
 
 #cta-card .container .card h2 {

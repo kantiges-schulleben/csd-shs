@@ -46,7 +46,6 @@ body {
 
 .error-message {
     display: inline-block;
-    border-radius: 15px;
     font-size: 2rem;
     text-transform: uppercase;
     padding: 1rem;
@@ -65,7 +64,6 @@ body {
     font-size: 1.7rem;
     background: var(--primary-color);
     padding: 10px 45px;
-    border-radius: 50px;
 }
 
 .error-cta:hover {

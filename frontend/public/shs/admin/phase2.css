@@ -8,7 +8,6 @@ h1 {
 
 .pairCard {
     border: 1px solid var(--secondary-color);
-    border-radius: 5px;
     padding: 5px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);

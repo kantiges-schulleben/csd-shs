@@ -71,9 +71,7 @@ body {
     /*border: 1px solid #38d39f; /*#957c09
     padding: 1rem 2.5rem;*/
     background-color: #38d39f; /*red*/
-    /*border-radius: 30px;*/
     padding: 10px 45px;
-    border-radius: 50px;
     transition: background-color 0.5s;
 }
 

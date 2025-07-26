@@ -54,7 +54,6 @@ a.button1 {
     background-color: var(--primary-color);
     color: var(--font-light);
     font-size: 20px;
-    border-radius: 85px;
     border: 2px solid var(--primary-color);
     margin: 0vh 2vh 0vh 2vh;
 }
@@ -76,7 +75,6 @@ a.button2 {
     background-color: var(--primary-color);
     color: var(--font-light);
     font-size: 20px;
-    border-radius: 85px;
     border: none;
     margin: 0vh 2vh 0vh 2vh;
 }
@@ -102,7 +100,6 @@ a.button2:hover {
 
 .item2 {
     box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.459);
-    border-radius: 25px;
     padding: 40px;
     margin: 20px;
     height: 100px;
@@ -123,7 +120,6 @@ a.button2:hover {
 .item2 img {
     height: 150px;
     margin-bottom: 20px;
-    border-radius: 5px;
 }
 
 .item2 .f {

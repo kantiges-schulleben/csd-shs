@@ -73,7 +73,6 @@ header p {
 ::-webkit-scrollbar-thumb {
     opacity: 10%;
     background: rgba(85, 85, 85, 0.39);
-    border-radius: 5px;
 }
 ::-webkit-scrollbar-thumb:hover {
     background: rgb(85, 85, 85);
@@ -143,7 +142,6 @@ nav {
 
 .menu-bar ul li:hover {
     background: #16cc68;
-    border-radius: 50px;
     padding: 10px 30px 10px 30px;
     transform: scale(1.02);
     transform-origin: center;
@@ -157,7 +155,6 @@ nav {
     position: fixed;
     background: rgba(20, 20, 20, 0.959);
     box-shadow: 2px 8px 14px 0px rgba(12, 12, 12, 0.596);
-    border-radius: 15px;
     margin-top: 10px;
     margin-left: -32px;
 }
@@ -172,7 +169,6 @@ nav {
     padding: 10px;
     border-bottom: 1px dotted #fff;
     background: transparent;
-    border-radius: 0;
     text-align: center;
 }
 
@@ -304,7 +300,6 @@ a {
     }
     .menu-bar ul li:hover {
         background-color: rgb(39, 39, 39);
-        border-radius: 50px;
         padding: 0px 30px 50px 30px;
         transform-origin: center;
         height: 300px;
@@ -323,7 +318,6 @@ a {
         background-color: rgb(39, 39, 39);
         box-shadow: none;
         min-width: 100%;
-        border-radius: 15px;
         margin-top: 10px;
     }
     .menu-bar ul li:hover .sub-menu-1 ul {
@@ -338,7 +332,6 @@ a {
         text-align: center;
         border-bottom: 1px dotted #16cc68;
         background: transparent;
-        border-radius: 0;
     }
     .menu-bar ul li:hover .sub-menu-1 ul li:hover {
         height: 40px;

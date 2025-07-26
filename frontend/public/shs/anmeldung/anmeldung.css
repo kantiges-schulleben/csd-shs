@@ -33,7 +33,6 @@
     margin: 6% auto;
     padding: 15px;
     overflow: hidden;
-    border-radius: 50px;
     border: 2px solid var(--primary-color);
 }
 
@@ -43,11 +42,8 @@
     margin: 35px auto;
     position: relative;
     /*#ff61241f*/
-    border-radius: 50px;
     /*background:#16cc68;/*red*/
-    /*border-radius: 30px;
   padding: 10px 45px;
-  border-radius: 50px;*/
 }
 
 .nachhilfe {
@@ -67,7 +63,6 @@
     width: 130px;
     height: 100%;
     background-color: var(--primary-color);
-    border-radius: 30px;
     transition: 0.5s;
 }
 
@@ -120,7 +115,6 @@
     color: var(--font-light);
     border: 0;
     outline: none;
-    border-radius: 30px;
 }
 .anmeldungshs:hover {
     background: var(--secondary-color);
@@ -206,14 +200,12 @@ h2 {
     width: 100%;
     opacity: 0;
     transition: all 0.4s;
-    border-radius: 8px;
     overflow: hidden;
     order: 1;
 }
 
 .selected {
     background: var(--primary-color);
-    border-radius: 8px;
     margin-bottom: 2px;
     /*8px*/
     color: var(--font-light);
@@ -251,12 +243,10 @@ h2 {
 .select-box .options-container::-webkit-scrollbar {
     width: 8px;
     background: #0d141f;
-    border-radius: 0 8px 8px 0;
 }
 
 .select-box .options-container::-webkit-scrollbar-thumb {
     background: #525861;
-    border-radius: 0 8px 8px 0;
 }
 
 .select-box .option,
@@ -285,7 +275,6 @@ h2 {
     font-family: 'Roboto', sans-serif;
     font-size: 14px;
     position: absolute;
-    border-radius: 8px 8px 0 0;
     border: 8px solid var(--primary-color);
     opacity: 0;
     pointer-events: none;
