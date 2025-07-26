@@ -8,11 +8,12 @@
 
 #actualContent input,
 #actualContent select {
-    border: 1px solid var(--accent);
+    border: 1px solid var(--primary-color);
     height: 25px;
     width: 25%;
-    color: black;
+    color: var(--font-dark);
     border-radius: 5px;
+    background-color: var(--background);
 }
 
 #actualContent input[type='checkbox'] {
@@ -35,7 +36,7 @@ table {
 }
 
 .outputTable:hover {
-    background-color: var(--accent);
+    background-color: var(--primary-color);
 }
 
 td {

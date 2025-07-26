@@ -2,29 +2,9 @@
     width: 100%;
 }
 
-#mydiv {
-    position: absolute;
-    z-index: 9;
-    background-color: #f1f1f1;
-    text-align: center;
-
-    visibility: collapse;
-}
-
-#mydivheader {
-    padding: 10px;
-    cursor: move;
-    z-index: 10;
-    background-color: #d1d1d1;
-    color: #000;
-}
-
 .closeButton {
     position: absolute;
     right: 5px;
-
-    background-color: #ff5555;
-    color: white;
 
     width: 20px;
     height: 20px;

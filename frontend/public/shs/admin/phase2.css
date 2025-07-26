@@ -7,7 +7,7 @@ h1 {
 }
 
 .pairCard {
-    border: 1px solid #16cc68;
+    border: 1px solid var(--secondary-color);
     border-radius: 5px;
     padding: 5px;
     display: grid;
@@ -35,7 +35,7 @@ h1 {
 }
 
 .p2 td:first-child {
-    border-right: 1px solid #fcfcfc;
+    border-right: 1px solid var(--font-light);
 }
 
 .p2 tr {
@@ -44,7 +44,7 @@ h1 {
 }
 
 .p2 tr:nth-child(even) {
-    background-color: #272727;
+    background-color: var(--secondary-color);
 }
 
 li {
@@ -53,15 +53,7 @@ li {
 }
 
 .pairCard:hover {
-    background-color: #16cc68;
-}
-
-.pairCard:hover button {
-    background-color: #323232;
-}
-
-.pairCard:hover .dangerButton {
-    background-color: tomato;
+    background-color: var(--secondary-color);
 }
 
 .popupConnectBody {

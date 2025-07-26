@@ -1,22 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300&display=swap');
 
-:root {
-    --font: #fff;
-    --background: #323232;
-    --lighter: #3e3e3e;
-    --accent: #16cc68;
-}
-
-::selection {
-    background: var(--font);
-    color: var(--background);
-}
-
-::-moz-selection {
-    background: var(--font);
-    color: var(--accent);
-}
-
 .header {
     padding: 5px;
     background-color: var(--lighter);
@@ -45,9 +28,9 @@
 }
 
 button {
-    border: 0px solid var(--accent);
-    background-color: var(--accent);
-    color: var(--font);
+    border: 0px solid var(--primary-color);
+    background-color: var(--primary-color);
+    color: var(--font-light);
     padding: 5px;
     text-align: center;
 }

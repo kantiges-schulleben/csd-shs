@@ -134,7 +134,7 @@ function loadSingle() {
                         },
                         {
                             tag: 'label',
-                            text: 'Lehrer*in:',
+                            text: 'JT:',
                         },
                         {
                             tag: 'label',
@@ -232,7 +232,7 @@ function loadGroup() {
                         },
                         {
                             tag: 'label',
-                            text: 'Lehrer*in:',
+                            text: 'JT:',
                         },
                         {
                             tag: 'label',
@@ -372,7 +372,7 @@ function loadWithout() {
                                 children: [
                                     {
                                         tag: 'th',
-                                        text: 'Lehrer*innen',
+                                        text: 'JT',
                                     },
                                     {
                                         tag: 'th',
@@ -543,7 +543,7 @@ function openConnectPopup() {
                     },
                     {
                         tag: 'p',
-                        text: 'Lehrer*in:',
+                        text: 'JT:',
                     },
                     {
                         tag: 'select',
