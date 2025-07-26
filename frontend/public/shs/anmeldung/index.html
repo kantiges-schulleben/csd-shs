@@ -35,7 +35,6 @@
         <div class="kontaktformular">
             <div class="form-box">
                 <div class="button-box">
-                    <div id="platt"></div>
                     <button
                         type="button"
                         id="x"
@@ -52,6 +51,9 @@
                     >
                         Schüler*in
                     </button>
+                    <div id="platt">
+                        <button class="nachhilfe" id="hackybutton">JT</button>
+                    </div>
                 </div>
 
                 <form id="lehrer" class="input-group">
@@ -1404,12 +1406,14 @@
                     x.style.left = '-400px';
                     y.style.left = '50px';
                     z.style.left = '130px';
+                    document.getElementById("hackybutton").innerText = 'Schüler*in';
                 }
 
                 function login() {
                     x.style.left = '50px';
                     y.style.left = '450px';
                     z.style.left = '0px';
+                    document.getElementById("hackybutton").innerText = 'JT';
                 }
             </script>
         </div>

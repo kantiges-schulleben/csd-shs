@@ -43,7 +43,12 @@
     position: relative;
     /*#ff61241f*/
     /*background:#16cc68;/*red*/
-  padding: 10px 45px;
+    padding: 10px 45px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: 1fr;
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
 }
 
 .nachhilfe {
@@ -53,7 +58,6 @@
     border: 0;
     outline: none;
     position: relative;
-    width: calc(50% - 5px);
 }
 
 #platt {
@@ -64,6 +68,15 @@
     height: 100%;
     background-color: var(--primary-color);
     transition: 0.5s;
+    color: var(--font-light);
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#platt button {
+  color: var(--font-light);
 }
 
 .oben-abstand {
@@ -175,7 +188,7 @@
 }
 
 .klassen {
-  min-height: 65px;
+    min-height: 65px;
 }
 
 h2 {
