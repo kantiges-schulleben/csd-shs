@@ -24,7 +24,7 @@
 }
 
 .popupBody {
-    background-color: var(--secondary-color);
+    background-color: var(--background);
     display: inline-block;
     min-width: 20%;
     min-height: 10%;

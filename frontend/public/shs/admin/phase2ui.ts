@@ -539,9 +539,6 @@ function openConnectPopup() {
                         ],
                     },
                     {
-                        tag: 'div',
-                    },
-                    {
                         tag: 'p',
                         text: 'JT:',
                     },
@@ -551,9 +548,6 @@ function openConnectPopup() {
                         id: 'selectTeacherConnect',
                     },
                     {
-                        tag: 'div',
-                    },
-                    {
                         tag: 'p',
                         text: 'Schüler*in:',
                     },
@@ -561,10 +555,6 @@ function openConnectPopup() {
                         tag: 'select',
                         classes: ['outputDetails'],
                         id: 'selectStudentConnect',
-                    },
-                    {
-                        tag: 'button',
-                        text: '+',
                     },
                 ],
             },
