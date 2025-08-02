@@ -89,7 +89,6 @@ function preload() {
     link.rel = 'icon';
     link.href = '/public/favicon.svg';
     document.getElementsByTagName('head')[0].appendChild(link);
-    const backend: string = "http://localhost:8080";
 
     fetch(`${backend}/api/users/menu`, {
       headers: {

@@ -155,7 +155,6 @@ interface User {
 function search() {
     let username: string = (edom.findById('inputUserName') as edomInputElement)
         .value;
-    let backend = 'http://localhost:8080';
 
     fetch(`${backend}/api/users/search?q=${username}`, {
         headers: {
@@ -239,7 +238,6 @@ interface Permission {
 }
 
 function populateDetails(userID: string) {
-    let backend = 'http://localhost:8080';
     fetch(`${backend}/api/users/${userID}`, {
         headers: {
             Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
@@ -331,7 +329,6 @@ function populateDetails(userID: string) {
 }
 
 function loadAllPermissions(): Promise<Permission[]> {
-    let backend = 'http://localhost:8080';
     return new Promise((resolve, reject) => {
         fetch(`${backend}/api/permissions/`, {
             headers: {
@@ -357,7 +354,6 @@ function loadAllPermissions(): Promise<Permission[]> {
 }
 
 function loadUserPermissions(userId: number): Promise<Permission[]> {
-    let backend = 'http://localhost:8080';
     return new Promise((resolve, reject) => {
         fetch(`${backend}/api/permissions/user/${userId}`, {
             headers: {
@@ -383,7 +379,6 @@ function loadUserPermissions(userId: number): Promise<Permission[]> {
 }
 
 function saveDetails(ID: number) {
-    let backend = 'http://localhost:8080';
     fetch(`${backend}/api/users/${ID}`, {
         method: 'PUT',
         headers: {
@@ -419,7 +414,6 @@ function deleteUser(ID: string, username: string) {
         edom.findById('bttnDelete')?.applyStyle('fa', 'fa-spinner');
         edom.findById('bttnDelete')?.setText('');
 
-        let backend = 'http://localhost:8080';
         fetch(`${backend}/api/users/${ID}`, {
             method: 'DELETE',
             headers: {

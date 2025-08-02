@@ -1,4 +1,3 @@
-const backend: string = "http://localhost:8080";
 function startup() {
     edom.init();
     renderDefaultUi();
