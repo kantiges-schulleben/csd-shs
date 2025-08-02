@@ -61,8 +61,16 @@ public class JwtAuthPreFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Unauthorized");
+            if (
+                requestRouteMatcher.isRestrictedRouteOptional(path, method) ||
+                requestRouteMatcher.isRestrictedRoute(path, method) ||
+                requestRouteMatcher.isRestrictedRouteNeedsPermission(path, method)
+            ) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Unauthorized");
+            } else {
+                filterChain.doFilter(request, response);
+            }
             return;
         }
 
