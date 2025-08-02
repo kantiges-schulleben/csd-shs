@@ -323,7 +323,7 @@ function populateDetails(userID: string) {
             edom.findById('bttnDelete')?.addClick(
                 'clickDelete',
                 (self: edomElement) => {
-                    // deleteUser(userID, data.userdata.benutzername);
+                    deleteUser(userID, data.name);
                 }
             );
         });
@@ -419,19 +419,33 @@ function deleteUser(ID: string, username: string) {
         edom.findById('bttnDelete')?.applyStyle('fa', 'fa-spinner');
         edom.findById('bttnDelete')?.setText('');
 
-        $.get(`/deleteUser/${ID}`, (data: obj) => {
-            if (data.success) {
+        let backend = 'http://localhost:8080';
+        fetch(`${backend}/api/users/${ID}`, {
+            method: 'DELETE',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+            },
+        })
+            .then((response: Response) => {
+                if (response.status !== 204) {
+                    throw new Error(
+                        `HTTP ${response.status} ${
+                            response.statusText
+                        } - ${response.text()}`
+                    );
+                }
                 edom.findById('bttnDelete')?.removeStyle('fa', 'fa-spinner');
                 edom.findById('bttnDelete')?.setText('löschen');
                 clearDetails();
                 search();
-            } else {
+            })
+            .catch((error: any) => {
+                console.error(error);
                 edom.findById('bttnDelete')?.swapStyle(
                     'fa-spinner',
                     'fa-times'
                 );
-            }
-        });
+            });
     }
 }
 

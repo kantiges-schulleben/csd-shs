@@ -97,10 +97,7 @@ public class PermissionService {
             permissions.add(permission.get());
         }
 
-        try {
-            userPermissionsRepository.deleteByUser_Id(userId);
-        } catch (Exception e) {
-            logger.error("Failed to clear permissions for user with ID {}", userId, e);
+        if (!deleteAllUserPermissions(userId)) {
             return false;
         }
 
@@ -120,6 +117,16 @@ public class PermissionService {
         }
 
         return true;
+    }
+
+    public boolean deleteAllUserPermissions(Long userId) {
+        try {
+            userPermissionsRepository.deleteByUser_Id(userId);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to delete permissions for user with ID {}", userId, e);
+            return false;
+        }
     }
 
     public boolean existsDevPermission() {

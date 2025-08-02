@@ -36,4 +36,13 @@ public class UserService {
     public List<UserEntity> searchByName(String query) {
         return userRepository.findByNameContainingIgnoreCase(query);
     }
+
+    public UserEntity deleteUser(Long id) {
+        Optional<UserEntity> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+            return user.get();
+        }
+        return null;
+    }
 }

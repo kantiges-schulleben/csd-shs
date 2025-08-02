@@ -54,8 +54,17 @@ import java.util.Optional;
     }
 
     @DeleteMapping("/{ID}")
-    public ResponseEntity<?> deleteUser() {
-        return ResponseEntity.status(501).build();
+    public ResponseEntity<?> deleteUser(@PathVariable("ID") Long ID) {
+        final boolean permissionsDeleted = permissionService.deleteAllUserPermissions(ID);
+        if (!permissionsDeleted) {
+            return ResponseEntity.status(500).build();
+        }
+
+        final UserEntity deletedUser = userService.deleteUser(ID);
+        if (deletedUser != null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @GetMapping("/menu")
