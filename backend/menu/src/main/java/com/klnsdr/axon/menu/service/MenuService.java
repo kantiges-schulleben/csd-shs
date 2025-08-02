@@ -20,7 +20,7 @@ public class MenuService {
     private static final String LOGOUT_MENU_NAME = "Logout";
     private static final String LOGOUT_MENU_LOCATION = "/api/users/logout";
     private static final String DEVELOPER_MENU_NAME = "Developer";
-    private static final String DEVELOPER_MENU_LOCATION = "/controlpanel";
+    private static final String DEVELOPER_MENU_LOCATION = "/dev";
     private static final String SHS_ADMIN_MENU_NAME = "SHS Admin";
     private static final String SHS_ADMIN_MENU_LOCATION = "/shs/admin";
 

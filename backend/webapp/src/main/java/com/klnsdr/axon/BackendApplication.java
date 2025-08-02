@@ -44,6 +44,13 @@ public class BackendApplication {
             developerPermission = permissionService.getPermissionByName(WellKnownPermissions.DEVELOPER.getName()).get();
         }
 
+        final Optional<Permission> shsAdmin = permissionService.getPermissionByName(WellKnownPermissions.SHS_ADMIN.getName());
+
+        if (shsAdmin.isEmpty()) {
+            permissionService.createPermission(WellKnownPermissions.SHS_ADMIN.getName());
+            logger.info("SHS Admin permission created.");
+        }
+
         final Optional<UserEntity> adminUser = userService.getAdminUser();
 
         if (adminUser.isEmpty()) {

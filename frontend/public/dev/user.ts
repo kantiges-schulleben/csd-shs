@@ -1,3 +1,4 @@
+let permissions: { [key: number]: boolean } = {};
 // markup
 function muUser(): obj {
     return [
@@ -66,34 +67,8 @@ function muUser(): obj {
                                                             tag: 'td',
                                                             children: [
                                                                 {
-                                                                    tag: 'input',
+                                                                    tag: 'label',
                                                                     id: 'inputName',
-                                                                    classes: [
-                                                                        'outputDetails',
-                                                                    ],
-                                                                },
-                                                            ],
-                                                        },
-                                                    ],
-                                                },
-                                                {
-                                                    tag: 'tr',
-                                                    children: [
-                                                        {
-                                                            tag: 'td',
-                                                            children: [
-                                                                {
-                                                                    tag: 'lable',
-                                                                    text: 'Username:',
-                                                                },
-                                                            ],
-                                                        },
-                                                        {
-                                                            tag: 'td',
-                                                            children: [
-                                                                {
-                                                                    tag: 'lable',
-                                                                    id: 'outputUsername',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -120,32 +95,6 @@ function muUser(): obj {
                                                                 {
                                                                     tag: 'lable',
                                                                     id: 'outputID',
-                                                                    classes: [
-                                                                        'outputDetails',
-                                                                    ],
-                                                                },
-                                                            ],
-                                                        },
-                                                    ],
-                                                },
-                                                {
-                                                    tag: 'tr',
-                                                    children: [
-                                                        {
-                                                            tag: 'td',
-                                                            children: [
-                                                                {
-                                                                    tag: 'lable',
-                                                                    text: 'Mail:',
-                                                                },
-                                                            ],
-                                                        },
-                                                        {
-                                                            tag: 'td',
-                                                            children: [
-                                                                {
-                                                                    tag: 'input',
-                                                                    id: 'inputMail',
                                                                     classes: [
                                                                         'outputDetails',
                                                                     ],
@@ -196,17 +145,34 @@ function muUser(): obj {
 
 // =======================================================================================
 
+interface User {
+    id: number;
+    name: string;
+    idpID: string;
+}
+
 // code
 function search() {
     let username: string = (edom.findById('inputUserName') as edomInputElement)
         .value;
+    let backend = 'http://localhost:8080';
 
-    $.post(
-        '/searchUser',
-        {
-            username: username,
+    fetch(`${backend}/api/users/search?q=${username}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
         },
-        (data: obj) => {
+    })
+        .then((response: Response) => {
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status} ${
+                        response.statusText
+                    } - ${response.text()}`
+                );
+            }
+            return response.json();
+        })
+        .then((users: User[]) => {
             edom.findById('outputSearch')?.clear();
 
             let rows: obj[] = [
@@ -220,10 +186,6 @@ function search() {
                         },
                         {
                             tag: 'td',
-                            text: 'Benutzer*innenname',
-                        },
-                        {
-                            tag: 'td',
                             text: 'Name',
                         },
                     ],
@@ -232,7 +194,7 @@ function search() {
 
             let counter: number = 0;
 
-            data.userlist.forEach((user: obj) => {
+            users.forEach((user: User) => {
                 rows.push({
                     tag: 'tr',
                     classes: ['outputTable', `line${counter % 2}`],
@@ -240,10 +202,6 @@ function search() {
                         {
                             tag: 'td',
                             text: user.id,
-                        },
-                        {
-                            tag: 'td',
-                            text: user.benutzername,
                         },
                         {
                             tag: 'td',
@@ -271,127 +229,189 @@ function search() {
                 ],
                 edom.findById('outputSearch')
             );
-        }
-    );
+        });
+}
+
+interface Permission {
+    id: number;
+    name: string;
+    internalName: string;
 }
 
 function populateDetails(userID: string) {
-    const outputs: string[] = ['outputName', 'outputUsername', 'outputID'];
-    const inputs: string[] = ['inputMail'];
-    $.get('/userdata/' + userID, (data: obj) => {
-        (edom.findById('inputName') as edomInputElement).setContent(
-            data.userdata.name
-        );
-        edom.findById('outputUsername')?.setText(data.userdata.benutzername);
-        edom.findById('outputID')?.setText(data.userdata.id);
-        (edom.findById('inputMail') as edomInputElement).setContent(
-            data.userdata.mail
-        );
+    let backend = 'http://localhost:8080';
+    fetch(`${backend}/api/users/${userID}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+        },
+    })
+        .then((response: Response) => {
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status} ${
+                        response.statusText
+                    } - ${response.text()}`
+                );
+            }
+            return response.json();
+        })
+        .then((data: User) => {
+            (edom.findById('inputName') as edomInputElement).setText(data.name);
+            edom.findById('outputID')?.setText(data.id.toString());
 
-        edom.findById('berechtigungen0')?.clear();
-        edom.findById('berechtigungen1')?.clear();
+            edom.findById('berechtigungen0')?.clear();
+            edom.findById('berechtigungen1')?.clear();
 
-        const berechtigungen: string[] =
-            data.userdata.berechtigung !== null
-                ? data.userdata.berechtigung.split(',')
-                : ''.split(',');
+            permissions = {};
 
-        let columns: obj[][] = [
-            [], // left
-            [], // right
-        ];
+            let columns: obj[][] = [
+                [], // left
+                [], // right
+            ];
 
-        let counter: number = 0;
+            Promise.all([
+                loadAllPermissions(),
+                loadUserPermissions(data.id),
+            ]).then(([allPermissions, userPermissions]: Permission[][]) => {
+                allPermissions.forEach(
+                    (permission: Permission, index: number) => {
+                        const hasPermission: boolean =
+                            userPermissions.find(
+                                (userPermission: Permission) =>
+                                    permission.id === userPermission.id
+                            ) !== undefined;
+                        permissions[permission.id] = hasPermission;
+                        columns[index % 2].push(
+                            {
+                                tag: 'input',
+                                type: 'checkbox',
+                                id: `cb${permission.id}`,
+                                state: hasPermission,
+                                handler: [
+                                    {
+                                        type: 'click',
+                                        id: 'clickChangeState',
+                                        arguments: '',
+                                        body: `permissions[${permission.id}] = !permissions[${permission.id}]`,
+                                    },
+                                ],
+                            },
+                            {
+                                tag: 'label',
+                                for: `cb${permission.id}`,
+                                text: permission.name,
+                            },
+                            {
+                                tag: 'br',
+                            }
+                        );
+                    }
+                );
+                edom.fromTemplate(columns[0], edom.findById('berechtigungen0'));
+                edom.fromTemplate(columns[1], edom.findById('berechtigungen1'));
+            });
 
-        Object.keys(data.berechtigungen).forEach((index: string) => {
-            /*
-            <label>
-                <input type="checkbox" name="checkbox" value="value">
-                Text
-            </label>
-            */
-            columns[counter % 2].push(
-                {
-                    tag: 'input',
-                    type: 'checkbox',
-                    id: `cb${data.berechtigungen[index]}`,
-                    state: berechtigungen.includes(index),
-                },
-                {
-                    tag: 'label',
-                    for: `cb${data.berechtigungen[index]}`,
-                    text: data.berechtigungen[index],
-                },
-                {
-                    tag: 'br',
+            edom.findById('bttnSave')?.deleteClick('clickSave');
+            edom.findById('bttnSave')?.addClick(
+                'clickSave',
+                (_self: edomElement) => {
+                    saveDetails(data.id);
                 }
             );
 
-            counter++;
+            edom.findById('bttnDelete')?.deleteClick('clickDelete');
+            edom.findById('bttnDelete')?.addClick(
+                'clickDelete',
+                (self: edomElement) => {
+                    // deleteUser(userID, data.userdata.benutzername);
+                }
+            );
         });
-
-        edom.fromTemplate(columns[0], edom.findById('berechtigungen0'));
-        edom.fromTemplate(columns[1], edom.findById('berechtigungen1'));
-
-        edom.findById('bttnSave')?.deleteClick('clickSave');
-        edom.findById('bttnSave')?.addClick(
-            'clickSave',
-            (self: edomElement) => {
-                saveDetails(data.berechtigungen, userID);
-            }
-        );
-
-        edom.findById('bttnDelete')?.deleteClick('clickDelete');
-        edom.findById('bttnDelete')?.addClick(
-            'clickDelete',
-            (self: edomElement) => {
-                deleteUser(userID, data.userdata.benutzername);
-            }
-        );
-    });
     window.scrollTo(0, 0);
 }
 
-function saveDetails(berechtigungen: obj, ID: string) {
-    const mail: string = (edom.findById('inputMail') as edomInputElement).value;
-    const name: string = (edom.findById('inputName') as edomInputElement).value;
-    let userBerechtigungen: string = '';
-
-    Object.keys(berechtigungen).forEach((index: string) => {
-        if (
-            (edom.findById(`cb${berechtigungen[index]}`) as edomInputElement)
-                .state
-        ) {
-            userBerechtigungen += index.toString() + ',';
-        }
+function loadAllPermissions(): Promise<Permission[]> {
+    let backend = 'http://localhost:8080';
+    return new Promise((resolve, reject) => {
+        fetch(`${backend}/api/permissions/`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+            },
+        })
+            .then((response: Response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP ${response.status} ${
+                            response.statusText
+                        } - ${response.text()}`
+                    );
+                }
+                return response.json();
+            })
+            .then((permissions: Permission[]) => resolve(permissions))
+            .catch((error: any) => {
+                console.error('Error fetching student:', error);
+                reject(error);
+            });
     });
+}
 
-    console.log('ID', ID);
-    console.log('mail', mail);
-    console.log('name', name);
-    console.log('berechtigungen:', berechtigungen);
-    console.log('userBerechtigungen:', userBerechtigungen);
+function loadUserPermissions(userId: number): Promise<Permission[]> {
+    let backend = 'http://localhost:8080';
+    return new Promise((resolve, reject) => {
+        fetch(`${backend}/api/permissions/user/${userId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
+            },
+        })
+            .then((response: Response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP ${response.status} ${
+                            response.statusText
+                        } - ${response.text()}`
+                    );
+                }
+                return response.json();
+            })
+            .then((permissions: Permission[]) => resolve(permissions))
+            .catch((error: any) => {
+                console.error('Error fetching student:', error);
+                reject(error);
+            });
+    });
+}
 
-    edom.findById('bttnSave')?.applyStyle('fa', 'fa-spinner');
-    edom.findById('bttnSave')?.setText('');
-
-    $.post(
-        `/updateuser/${ID}`,
-        {
-            mail: mail,
-            name: name,
-            berechtigungen: userBerechtigungen,
+function saveDetails(ID: number) {
+    let backend = 'http://localhost:8080';
+    fetch(`${backend}/api/users/${ID}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${localStorage.getItem('csd_token')}`,
         },
-        (data: obj) => {
-            if (data.success) {
-                edom.findById('bttnSave')?.removeStyle('fa', 'fa-spinner');
-                edom.findById('bttnSave')?.setText('speichern');
-                clearDetails();
-            } else {
-                edom.findById('bttnSave')?.swapStyle('fa-spinner', 'fa-times');
+        body: JSON.stringify({
+            permissionIds: Object.keys(permissions)
+                .filter((key: string) => permissions[parseInt(key)])
+                .map((key: string) => parseInt(key)),
+        }),
+    })
+        .then((response: Response) => {
+            if (!response.ok) {
+                throw new Error(
+                    `HTTP ${response.status} ${
+                        response.statusText
+                    } - ${response.text()}`
+                );
             }
-        }
-    );
+            edom.findById('bttnSave')?.removeStyle('fa', 'fa-spinner');
+            edom.findById('bttnSave')?.setText('speichern');
+            clearDetails();
+        })
+        .catch((error: any) => {
+            console.error('Error fetching student:', error);
+            edom.findById('bttnSave')?.swapStyle('fa-spinner', 'fa-times');
+        });
 }
 
 function deleteUser(ID: string, username: string) {
@@ -416,10 +436,9 @@ function deleteUser(ID: string, username: string) {
 }
 
 function clearDetails() {
-    (edom.findById('inputName') as edomInputElement).setContent('');
+    (edom.findById('inputName') as edomInputElement).setText('');
     edom.findById('outputUsername')?.setText('');
     edom.findById('outputID')?.setText('');
-    (edom.findById('inputMail') as edomInputElement).setContent('');
 
     edom.findById('berechtigungen0')?.clear();
     edom.findById('berechtigungen1')?.clear();

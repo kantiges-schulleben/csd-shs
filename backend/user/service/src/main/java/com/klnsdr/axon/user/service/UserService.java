@@ -3,6 +3,7 @@ package com.klnsdr.axon.user.service;
 import com.klnsdr.axon.user.entity.UserEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,10 @@ public class UserService {
         return userRepository.findByIdpIDEquals(idpID);
     }
 
+    public Optional<UserEntity> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
     public UserEntity createUser(String idpID, String name) {
         final UserEntity user = new UserEntity();
         user.setIdpID(idpID);
@@ -26,5 +31,9 @@ public class UserService {
 
     public Optional<UserEntity> getAdminUser() {
         return userRepository.findById(1L);
+    }
+
+    public List<UserEntity> searchByName(String query) {
+        return userRepository.findByNameContainingIgnoreCase(query);
     }
 }

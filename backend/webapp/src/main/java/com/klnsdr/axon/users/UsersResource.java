@@ -2,23 +2,34 @@ package com.klnsdr.axon.users;
 
 import com.klnsdr.axon.menu.entity.MenuItemEntity;
 import com.klnsdr.axon.menu.service.MenuService;
+import com.klnsdr.axon.permissions.service.PermissionService;
+import com.klnsdr.axon.user.entity.UserEntity;
+import com.klnsdr.axon.user.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users") public class UsersResource {
     private final MenuService menuService;
+    private final UserService userService;
+    private final PermissionService permissionService;
 
-    public UsersResource(MenuService menuService) {
+    public UsersResource(MenuService menuService, UserService userService, PermissionService permissionService) {
         this.menuService = menuService;
+        this.userService = userService;
+        this.permissionService = permissionService;
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchUsers() {
-        return ResponseEntity.status(501).build();
+    public List<UserEntity> searchUsers(@RequestParam("q") String query) {
+        if (query == null || query.isBlank()) {
+            return userService.getAdminUser().map(List::of).orElse(List.of());
+        }
+        return userService.searchByName(query);
     }
 
     @GetMapping("/")
@@ -27,13 +38,19 @@ import java.util.List;
     }
 
     @GetMapping("/{ID}")
-    public ResponseEntity<?> getUser() {
-        return ResponseEntity.status(501).build();
+    public ResponseEntity<UserEntity> getUser(@PathVariable("ID") Long ID) {
+        final Optional<UserEntity> user = userService.findById(ID);
+        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{ID}")
-    public ResponseEntity<?> updateUser() {
-        return ResponseEntity.status(501).build();
+    public ResponseEntity<?> updateUser(@RequestBody UpdatePermissionsDTO updatePermissionsDTO, @PathVariable("ID") Long ID) {
+        final boolean success = permissionService.clearAndSetPermissions(ID, updatePermissionsDTO.getPermissionIds());
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(500).build();
+        }
     }
 
     @DeleteMapping("/{ID}")
