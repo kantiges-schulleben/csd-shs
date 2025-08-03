@@ -37,9 +37,10 @@
         <script src="/public/preload.js"></script>
         <script src="/public/jwt.js"></script>
         <script src="/public/constants.js"></script>
+        <script src="/shs/information/sketch.js"></script>
     </head>
 
-    <body onload="preload();">
+    <body onload="preload(); loadEndDate()">
         <nav id="navbar"></nav>
         <section id="cards">
             <div class="container">
@@ -141,8 +142,7 @@
                             <a href="/shs/team/"><b>Hier zum Kontakt</b></a>
                             <br />
                             <b
-                                >Anmeldung ab 15. September 2022 und bis zum 7.
-                                Oktober 2022</b
+                              >Anmeldungsschluss ist der <label id="lblEnddate"></label></b
                             >
                         </p>
                     </div>

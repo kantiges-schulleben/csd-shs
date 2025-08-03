@@ -8,6 +8,7 @@ import com.klnsdr.axon.shs.entity.Student;
 import com.klnsdr.axon.shs.entity.Teacher;
 import com.klnsdr.axon.shs.entity.analysis.legacy.Group;
 import com.klnsdr.axon.shs.service.AnalysisConfigService;
+import com.klnsdr.axon.shs.service.ShsConfigService;
 import com.klnsdr.axon.shs.service.StudentService;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -22,10 +23,12 @@ import java.util.List;
 public class ShsAdminResource {
     private final StudentService studentService;
     private final AnalysisConfigService analysisConfigService;
+    private final ShsConfigService shsConfigService;
 
-    public ShsAdminResource(StudentService studentService, AnalysisConfigService analysisConfigService) {
+    public ShsAdminResource(StudentService studentService, AnalysisConfigService analysisConfigService, ShsConfigService shsConfigService) {
         this.studentService = studentService;
         this.analysisConfigService = analysisConfigService;
+        this.shsConfigService = shsConfigService;
     }
 
     @GetMapping("/students/count")
@@ -147,6 +150,16 @@ public class ShsAdminResource {
     public Group createGroup(@RequestBody CreateGroupDTO createGroupDTO) {
         try {
             return studentService.createGroup(createGroupDTO.getTeacherId(), createGroupDTO.getStudentId(), createGroupDTO.getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        }
+    }
+
+    @PutMapping("/end-date")
+    public ResponseEntity<?> setEnrollEndDate(@RequestBody UpdateEnrollEndDateDTO updateEnrollEndDateDTO) {
+        try {
+            shsConfigService.setEnrollEndDate(updateEnrollEndDateDTO.getEnrollEndDate());
+            return ResponseEntity.ok().build();
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
