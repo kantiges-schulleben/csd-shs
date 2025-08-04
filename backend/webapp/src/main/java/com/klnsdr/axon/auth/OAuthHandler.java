@@ -1,5 +1,8 @@
 package com.klnsdr.axon.auth;
 
+import com.klnsdr.axon.auth.identityProvider.GithubUserToCommonUser;
+import com.klnsdr.axon.auth.identityProvider.NextCloudUserToCommonUser;
+import com.klnsdr.axon.auth.identityProvider.OAuthUserToCommonUser;
 import com.klnsdr.axon.auth.token.service.TokenService;
 import com.klnsdr.axon.user.entity.UserEntity;
 import com.klnsdr.axon.user.service.UserService;
@@ -9,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -54,13 +58,15 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         try {
-            OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            final OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+            final String authClient = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
+            final OAuthUserToCommonUser oAuthUserProviderWrapper = getOAuthUserProviderWrapper(authClient, oAuth2User);
 
             if (oAuth2User == null) {
                 response.sendRedirect("/login?error=true");
                 return;
             }
-            final String idpID = Objects.requireNonNull(oAuth2User.getAttribute("id")).toString();
+            final String idpID = oAuthUserProviderWrapper.getId();
 
             final Optional<UserEntity> userOptional = userService.findByIdpID(idpID);
             UserEntity user;
@@ -68,7 +74,7 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
                 user = userOptional.get();
             } else {
                 logger.debug("Creating new user with IDP ID: {}", idpID);
-                final String name = oAuth2User.getAttribute("login");
+                final String name = oAuthUserProviderWrapper.getName();
                 user = userService.createUser(idpID, name);
             }
 
@@ -82,5 +88,14 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
             logger.error("Error during OAuth2 authentication success handling", e);
             response.sendRedirect("/login?error=true");
         }
+    }
+
+    private OAuthUserToCommonUser getOAuthUserProviderWrapper(String authClient, OAuth2User oAuth2User) {
+        if ("github".equals(authClient)) {
+            return new GithubUserToCommonUser(oAuth2User);
+        } else if ("nextcloud".equals(authClient)) {
+            return new NextCloudUserToCommonUser(oAuth2User);
+        }
+        throw new IllegalArgumentException("Unsupported OAuth2 provider: " + authClient);
     }
 }

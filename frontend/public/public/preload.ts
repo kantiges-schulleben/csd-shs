@@ -114,7 +114,7 @@ function preload() {
               localStorage.removeItem("csd_token");
               location.assign(`${backend}${item.location}`);
             });
-          } else if (item.location === "/oauth2/authorization/github") {
+          } else if (item.location.startsWith("/oauth2/authorization/")) {
             link.href = backend + item.location;
           }
 

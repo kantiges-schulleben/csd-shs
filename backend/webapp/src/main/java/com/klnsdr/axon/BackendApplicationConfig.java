@@ -2,6 +2,7 @@ package com.klnsdr.axon;
 
 import com.klnsdr.axon.auth.JwtAuthPreFilter;
 import com.klnsdr.axon.auth.OAuthHandler;
+import com.klnsdr.axon.auth.OAuthUserService;
 import com.klnsdr.axon.auth.token.service.TokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,11 +37,13 @@ public class BackendApplicationConfig implements WebMvcConfigurer {
     private final OAuthHandler oAuthHandler;
     private final JwtAuthPreFilter jwtAuthPreFilter;
     private final TokenService tokenService;
+    private final OAuthUserService oauthUserService;
 
-    public BackendApplicationConfig(OAuthHandler oAuthHandler, JwtAuthPreFilter jwtAuthPreFilter, TokenService tokenService) {
+    public BackendApplicationConfig(OAuthHandler oAuthHandler, JwtAuthPreFilter jwtAuthPreFilter, TokenService tokenService, OAuthUserService oauthUserService) {
         this.oAuthHandler = oAuthHandler;
         this.jwtAuthPreFilter = jwtAuthPreFilter;
         this.tokenService = tokenService;
+        this.oauthUserService = oauthUserService;
     }
 
     @Bean
@@ -52,6 +55,9 @@ public class BackendApplicationConfig implements WebMvcConfigurer {
             .oauth2Login(oauth2 -> oauth2
                     .successHandler(oAuthHandler)
                     .failureUrl(oauthFailureRedirectUrl)
+                    .userInfoEndpoint(userInfo -> userInfo
+                            .userService(this.oauthUserService.run())
+                    )
             ).logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/api/users/logout", "GET"))
                 .logoutSuccessUrl(oauthSuccessRedirectUrl)
