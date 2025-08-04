@@ -26,9 +26,6 @@ import java.util.Optional;
 
     @GetMapping("/search")
     public List<UserEntity> searchUsers(@RequestParam("q") String query) {
-        if (query == null || query.isBlank()) {
-            return userService.getAdminUser().map(List::of).orElse(List.of());
-        }
         return userService.searchByName(query);
     }
 

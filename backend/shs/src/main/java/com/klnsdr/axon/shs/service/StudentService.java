@@ -54,9 +54,6 @@ public class StudentService {
     }
 
     public List<EnrolledStudentEntity> searchByName(String query) {
-        if (query == null) {
-            return List.of();
-        }
         return studentRepository.findByNameContainingIgnoreCase(query);
     }
 
