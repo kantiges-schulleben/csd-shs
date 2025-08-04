@@ -78,7 +78,7 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
                 user = userService.createUser(idpID, name);
             }
 
-            final String token = jwtUtil.generateToken(oAuth2User, user);
+            final String token = jwtUtil.generateToken(oAuth2User, user, oAuthUserProviderWrapper);
             final Date validTill = jwtUtil.extractExpiration(token);
 
             tokenService.save(token, validTill);
