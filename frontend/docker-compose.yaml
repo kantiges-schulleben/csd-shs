@@ -3,10 +3,11 @@ version: '3.8'
 name: csd-shs
 
 services:
-  frontend:
+  csd_frontend:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: csd_frontend
     ports:
       - "3000:80"
     restart: unless-stopped

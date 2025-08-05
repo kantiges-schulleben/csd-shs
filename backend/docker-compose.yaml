@@ -3,17 +3,17 @@ version: '3.8'
 name: csd-shs
 
 services:
-  app:
+  csd_backend:
     build:
       context: .
       dockerfile: webapp/Dockerfile
-    container_name: app
+    container_name: csd_backend
     depends_on:
-      - db
+      - csd_database
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mariadb://db:3306/shelfens
+      SPRING_DATASOURCE_URL:
       SPRING_DATASOURCE_USERNAME:
       SPRING_DATASOURCE_PASSWORD:
       GITHUB_CLIENT_ID:
@@ -29,9 +29,9 @@ services:
       APP_AUTH_JWT_SECRET:
     networks:
       - csd_net
-  db:
+  csd_database:
     image: mariadb:10.3
-    container_name: db
+    container_name: csd_database
     volumes:
       - ./db:/docker-entrypoint-initdb.d
     environment:

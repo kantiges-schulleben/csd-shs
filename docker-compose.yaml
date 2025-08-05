@@ -1,20 +1,20 @@
 version: '3.8'
 
 services:
-  frontend:
+  csd_frontend:
     extends:
       file: ./frontend/docker-compose.yaml
-      service: frontend
+      service: csd_frontend
 
-  app:
+  csd_backend:
     extends:
       file: ./backend/docker-compose.yaml
-      service: app
+      service: csd_backend
 
-  db:
+  csd_database:
     extends:
       file: ./backend/docker-compose.yaml
-      service: db
+      service: csd_database
 
 networks:
   csd_net:
