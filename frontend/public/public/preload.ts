@@ -7,7 +7,7 @@ interface menuItem {
 function preload() {
   tokenPresent();
     // set title dynamically for all pages
-    document.title = 'kantiges Schulleben';
+    document.title = 'DEMO';
 
     // create Navbar
     document.getElementById('navbar')!.innerHTML = `
@@ -80,7 +80,7 @@ function preload() {
                     </ul>
                     <div class="cc">
                         <span class="fa fa-copyright"></span
-                        ><span>2022 All rights reserved.</span>
+                        ><span>${new Date().getFullYear()} All rights reserved.</span>
                     </div>
                 </div>`;
 
