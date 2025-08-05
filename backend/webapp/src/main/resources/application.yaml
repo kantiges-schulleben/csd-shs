@@ -2,9 +2,9 @@ spring:
   application:
     name: webapp
   datasource:
-    url:
-    username:
-    password:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
     hibernate:
@@ -15,15 +15,15 @@ spring:
       client:
         registration:
           github:
-            client-id:
-            client-secret:
-            redirect-uri: http://localhost:8080/login/oauth2/code/github
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
+            redirect-uri: ${GITHUB_REDIRECT_URI}
             authorization-grant-type: authorization_code
             scope: read_user
           nextcloud:
-            client-id:
-            client-secret:
-            redirect-uri: http://localhost:8080/login/oauth2/code/nextcloud
+            client-id: ${NEXTCLOUD_CLIENT_ID}
+            client-secret: ${NEXTCLOUD_CLIENT_SECRET}
+            redirect-uri: ${NEXTCLOUD_REDIRECT_URI}
             authorization-grant-type: authorization_code
         provider:
           github:
@@ -32,9 +32,9 @@ spring:
             user-info-uri: https://api.github.com/user
             user-name-attribute: id
           nextcloud:
-            authorization-uri: https://nextcloud.klnsdr.com/apps/oauth2/authorize
-            token-uri: https://nextcloud.klnsdr.com/apps/oauth2/api/v1/token
-            user-info-uri: https://nextcloud.klnsdr.com/ocs/v2.php/cloud/user?format=json
+            authorization-uri: ${NEXTCLOUD_URL}/apps/oauth2/authorize
+            token-uri: ${NEXTCLOUD_URL}/apps/oauth2/api/v1/token
+            user-info-uri: ${NEXTCLOUD_URL}/ocs/v2.php/cloud/user?format=json
             user-name-attribute: id
 logging:
   level:
@@ -44,13 +44,13 @@ server:
   port: 8080
 app:
   oauth2:
-    successRedirectUrl:
-    failRedirectUrl:
+    successRedirectUrl: ${APP_OAUTH2_SUCCESS_REDIRECT_URL}
+    failRedirectUrl: ${APP_OAUTH2_FAIL_REDIRECT_URL}
   frontend:
-    url:
+    url: ${APP_FRONTEND_URL}
   auth:
     jwt:
-      secret: lsadhflksjahfkjsdhfksdgfkh
+      secret: ${APP_AUTH_JWT_SECRET}
       expiration: 10800000 # 3 hours
 
 springdoc:

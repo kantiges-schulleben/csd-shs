@@ -13,16 +13,16 @@ public class CopyStudentDataHelper {
     }
 
     @Transactional
-    public boolean copyStudentsTable() {
-        return entityManager.createNativeQuery(
+    public void copyStudentsTable() {
+        entityManager.createNativeQuery(
                 "INSERT INTO locked_enrolled_students SELECT * from enrolled_students"
-        ).executeUpdate() > 0;
+        ).executeUpdate();
     }
 
     @Transactional
-    public boolean clearLockedStudentsTable() {
-        return entityManager.createNativeQuery(
+    public void clearLockedStudentsTable() {
+        entityManager.createNativeQuery(
                 "DELETE FROM locked_enrolled_students"
-        ).executeUpdate() > 0;
+        ).executeUpdate();
     }
 }

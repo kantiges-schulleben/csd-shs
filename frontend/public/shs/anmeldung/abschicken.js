@@ -1,27 +1,27 @@
-var nachhilfe = 1;
-var vorname;
-var nachname;
-var mail;
-var handy;
-var klasse;
-var fach;
-var klassenstufen;
-var anzahl;
-var warnung1 = [];
-var warnung2 = [];
-var warnung3 = [];
-var warnung4 = [];
-var warnung5 = [];
-var warnung6 = [];
-var warnung7 = [];
-var warnung8 = [];
-var warnung9 = [];
-var warnung10 = [];
-var warnung11 = [];
-var warnung12 = [];
-var warnung13 = [];
-var warnung14 = [];
-var warnung15 = [];
+let nachhilfe = 1;
+let vorname;
+let nachname;
+let mail;
+let handy;
+let klasse;
+let fach;
+let klassenstufen;
+let anzahl;
+let warnung1 = [];
+let warnung2 = [];
+let warnung3 = [];
+let warnung4 = [];
+let warnung5 = [];
+let warnung6 = [];
+let warnung7 = [];
+let warnung8 = [];
+let warnung9 = [];
+let warnung10 = [];
+let warnung11 = [];
+let warnung12 = [];
+let warnung13 = [];
+let warnung14 = [];
+let warnung15 = [];
 
 window.addEventListener('load', () => {
     vorname = document.getElementById('vorname1');
@@ -540,11 +540,10 @@ function doEnroll() {
     }
 }
 
-const backend = "http://localhost:8080";
 function doEnrollStudent() {
   const data = {
       name: vorname.value,
-      surename: nachname.value, // FIXME gibt immer null zurück
+      sureName: nachname.value,
       mail: mail.value,
       subject: fach.innerText,
       grade: parseInt(klasse.innerText),

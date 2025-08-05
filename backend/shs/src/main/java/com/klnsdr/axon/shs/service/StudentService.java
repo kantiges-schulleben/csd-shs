@@ -158,16 +158,8 @@ public class StudentService {
 //            studentRepository.deleteAll();
             groupService.deleteAllGroupsAndStudents();
 
-            final boolean didClear = copyStudentDataHelper.clearLockedStudentsTable();
-            if (!didClear) {
-                logger.error("Failed to clear locked students table");
-            }
-
-            final boolean didCopy = copyStudentDataHelper.copyStudentsTable();
-            if (!didCopy) {
-                logger.error("Failed to copy students table");
-            }
-
+            copyStudentDataHelper.clearLockedStudentsTable();
+            copyStudentDataHelper.copyStudentsTable();
             analysisConfigService.reset();
         } catch (Exception e) {
             logger.error("Unexpected error during data reset", e);
@@ -199,17 +191,19 @@ public class StudentService {
     private boolean runAnalysisInternal() {
         groupService.deleteAllGroupsAndStudents();
 
-        final boolean didClear = copyStudentDataHelper.clearLockedStudentsTable();
-        if (!didClear) {
-            logger.error("Failed to clear locked students table");
+        try {
+            copyStudentDataHelper.clearLockedStudentsTable();
+        } catch (Exception e) {
+            logger.error("Failed to clear locked students table", e);
             writeAnalysisStatusToDatabase(false, "Failed to clear locked students table");
             running.set(false);
             return false;
         }
 
-        final boolean didCopy = copyStudentDataHelper.copyStudentsTable();
-        if (!didCopy) {
-            logger.error("Failed to copy students table");
+        try {
+            copyStudentDataHelper.copyStudentsTable();
+        } catch (Exception e) {
+            logger.error("Failed to copy students table", e);
             writeAnalysisStatusToDatabase(false, "Failed to copy students table");
             running.set(false);
             return false;
