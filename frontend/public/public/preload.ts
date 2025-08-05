@@ -102,6 +102,7 @@ function preload() {
       return response.json();
     })
     .then((data: menuItem[]) => {
+        redirectToLoginIfNeeded(data);
         data.forEach((item: menuItem) => {
           const li: HTMLLIElement = document.createElement("li");
           const link: HTMLAnchorElement = document.createElement("a");
@@ -137,6 +138,27 @@ function preload() {
     });
 
     navSlide();
+}
+
+function redirectToLoginIfNeeded(menu: menuItem[]) {
+  const loginNeeded: string[] = [
+    "/shs/anmeldung",
+    "/dev",
+    "/shs/admin"
+  ];
+
+  if (menu.length > 1) {
+    return;
+  }
+  if (menu[0].name !== "Login") {
+    return;
+  }
+
+  const location: string = window.location.pathname;
+
+  if (loginNeeded.some(loc => location.startsWith(loc))) {
+    window.location.assign(backend + menu[0].location);
+  }
 }
 
 function tokenPresent() {
