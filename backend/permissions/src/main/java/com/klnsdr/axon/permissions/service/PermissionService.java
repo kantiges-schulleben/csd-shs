@@ -55,17 +55,9 @@ public class PermissionService {
         return true;
     }
 
-    public boolean hasPermission(UserEntity user, String permissionName) {
-        return hasPermission(user.getId(), permissionName);
-    }
-
     public boolean hasPermission(Long userId, String permissionName) {
         return userPermissionsRepository.findByUserId(userId).stream()
                 .anyMatch(up -> up.getPermission().getInternalName().equals(getInternalName(permissionName)));
-    }
-
-    public List<UserPermissions> getUserPermissions(UserEntity user) {
-        return userPermissionsRepository.findByUserId(user.getId());
     }
 
     public List<UserPermissions> getUserPermissions(Long userId) {
