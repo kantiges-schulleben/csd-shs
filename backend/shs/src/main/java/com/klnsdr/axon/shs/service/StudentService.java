@@ -23,13 +23,15 @@ public class StudentService {
     private final CopyStudentDataHelper copyStudentDataHelper;
     private final AnalysisConfigService analysisConfigService;
     private final GroupService groupService;
+    private final AnalysisScriptRunner analysisScriptRunner;
 
     public StudentService(
             StudentRepository studentRepository,
             LockedStudentRepository lockedStudentRepository,
             CopyStudentDataHelper copyStudentDataHelper,
             GroupService groupService,
-            AnalysisConfigService analysisConfigService
+            AnalysisConfigService analysisConfigService,
+            AnalysisScriptRunner analysisScriptRunner
 
     ) {
         this.studentRepository = studentRepository;
@@ -37,6 +39,7 @@ public class StudentService {
         this.copyStudentDataHelper = copyStudentDataHelper;
         this.groupService = groupService;
         this.analysisConfigService = analysisConfigService;
+        this.analysisScriptRunner = analysisScriptRunner;
     }
 
     public Teacher createTeacher(Teacher teacher) {
@@ -222,7 +225,7 @@ public class StudentService {
             return false;
         }
 
-        final Pair<Boolean, String> result = new AnalysisScriptRunner().runAnalysisScript(studentsAsParam);
+        final Pair<Boolean, String> result = analysisScriptRunner.runAnalysisScript(studentsAsParam);
         if (!result.getFirst()) {
             logger.error("Analysis script failed: {}", result.getSecond());
             writeAnalysisStatusToDatabase(false, result.getSecond().length() < 20 ? result.getSecond() : "Ein Fehler beim Ausführen des Skripts ist aufgetreten");

@@ -3,6 +3,7 @@ package com.klnsdr.axon.shs.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
+@Component
 public class AnalysisScriptRunner {
     private static final Logger logger = LoggerFactory.getLogger(AnalysisScriptRunner.class);
     public Pair<Boolean, String> runAnalysisScript(String param) {
@@ -41,7 +43,7 @@ public class AnalysisScriptRunner {
         }
     }
 
-    private Pair<Integer, String> runScript(Path path, String param) throws IOException, InterruptedException {
+    Pair<Integer, String> runScript(Path path, String param) throws IOException, InterruptedException {
         final ProcessBuilder pb = new ProcessBuilder("python3", path.toString(), param);
         final Process process = pb.start();
 
@@ -80,7 +82,7 @@ public class AnalysisScriptRunner {
         return Pair.of(exitCode, exitCode == 0 ? output.toString() : errorOutput.toString());
     }
 
-    private Optional<Path> copyScriptToTmp() {
+    Optional<Path> copyScriptToTmp() {
         final InputStream scriptStream = AnalysisScriptRunner.class.getResourceAsStream("/script.py");
         if (scriptStream == null) {
             logger.error("Cannot find analysis script script.py");
