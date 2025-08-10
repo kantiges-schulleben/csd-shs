@@ -30,4 +30,8 @@ public class TokenService {
         tokenRepository.delete(tokenEntity.get());
         return tokenEntity.get();
     }
+
+    public void deleteExpired() {
+        tokenRepository.deleteByValidTillBefore(new Date());
+    }
 }
