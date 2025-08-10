@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="KlnSdr" id="2025-08-10_createBaseTables">
+        <createTable tableName="analysis_config">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="value" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="analysis_groups">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="is_released" type="BIT"/>
+            <column name="subject" type="VARCHAR(255)"/>
+            <column defaultValueComputed="NULL" name="teacher_id" type="BIGINT"/>
+        </createTable>
+        <createTable tableName="auth_tokens">
+            <column name="token" type="VARCHAR(402)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="valid_till" type="TIMESTAMP(0)"/>
+        </createTable>
+        <createTable tableName="enrolled_students">
+            <column autoIncrement="true" name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="grade" type="INT"/>
+            <column name="is_group" type="BIT"/>
+            <column name="is_teacher" type="BIT"/>
+            <column name="mail" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="phone_number" type="VARCHAR(255)"/>
+            <column name="subject" type="VARCHAR(255)"/>
+            <column name="sure_name" type="VARCHAR(255)"/>
+            <column defaultValueComputed="NULL" name="target_grade" type="INT"/>
+        </createTable>
+        <createTable tableName="group_students">
+            <column name="group_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="student_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <createTable tableName="locked_enrolled_students">
+            <column autoIncrement="true" name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="grade" type="INT"/>
+            <column name="is_group" type="BIT"/>
+            <column name="is_teacher" type="BIT"/>
+            <column name="mail" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="phone_number" type="VARCHAR(255)"/>
+            <column name="subject" type="VARCHAR(255)"/>
+            <column name="sure_name" type="VARCHAR(255)"/>
+            <column defaultValueComputed="NULL" name="target_grade" type="INT"/>
+        </createTable>
+        <createTable tableName="permissions">
+            <column autoIncrement="true" name="permission_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="internal_name" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="shs_config">
+            <column name="id" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="value" type="VARCHAR(255)"/>
+        </createTable>
+        <createTable tableName="user_permissions">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column defaultValueComputed="NULL" name="permission_id" type="BIGINT"/>
+            <column defaultValueComputed="NULL" name="user_id" type="BIGINT"/>
+        </createTable>
+        <createTable tableName="users">
+            <column autoIncrement="true" name="user_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="idp_id" type="VARCHAR(255)"/>
+            <column name="display_name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

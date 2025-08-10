@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: webapp
+  datasource:
+    url: jdbc:mariadb://localhost:3306/shelfens
+    username: root
+    password: secret
+    driver-class-name: org.mariadb.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    database-platform: org.hibernate.dialect.MariaDBDialect
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id:
+            client-secret:
+            redirect-uri:
+            authorization-grant-type: authorization_code
+            scope: read_user
+          nextcloud:
+            client-id:
+            client-secret:
+            redirect-uri:
+            authorization-grant-type: authorization_code
+        provider:
+          github:
+            authorization-uri: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+            user-name-attribute: id
+          nextcloud:
+            authorization-uri:
+            token-uri:
+            user-info-uri:
+            user-name-attribute: id
+logging:
+  level:
+    root: INFO
+    com.klnsdr.axon: DEBUG
+server:
+  port: 8080
+app:
+  oauth2:
+    successRedirectUrl: https://localhost:3000
+    failRedirectUrl: http://localhost:3000/login?error=true
+  frontend:
+    url: http://localhost:3000
+  auth:
+    jwt:
+      secret: lsadhflks
+      expiration: 10800000 # 3 hours
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /v1/api-docs/swagger-ui.html
+    operationsSorter: method

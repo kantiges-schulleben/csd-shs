@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="KlnSdr" id="2025-08-10_createBasePermissions">
+        <insert tableName="permissions">
+            <column name="permission_id" valueNumeric="1"/>
+            <column name="internal_name" value="developer"/>
+            <column name="name" value="Developer"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="permission_id" valueNumeric="2"/>
+            <column name="internal_name" value="shs_admin"/>
+            <column name="name" value="SHS Admin"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>

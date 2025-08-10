@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="KlnSdr" id="2025-08-10_createBaseIndexes">
+        <createIndex associatedWith="" indexName="FK8tycco6any9n87rngpkinslsy" tableName="group_students">
+            <column name="group_id"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="FKkowxl8b2bngrxd1gafh13005u" tableName="user_permissions">
+            <column defaultValueComputed="NULL" name="user_id"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="FKlevcqc0qtwm1nsrskvcpfph2e" tableName="group_students">
+            <column name="student_id"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="FKnq5wxgc7ql19enr6t8qoy49mi" tableName="analysis_groups">
+            <column defaultValueComputed="NULL" name="teacher_id"/>
+        </createIndex>
+        <createIndex associatedWith="" indexName="FKq4qlrabt4s0etm9tfkoqfuib1" tableName="user_permissions">
+            <column defaultValueComputed="NULL" name="permission_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

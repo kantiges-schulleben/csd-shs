@@ -38,17 +38,16 @@ public class BackendApplication {
     public void initialize() { // TODO add this to an "Installer App"
         final Permission developerPermission;
         if (!permissionService.existsDevPermission()) {
-            developerPermission = permissionService.createPermission(WellKnownPermissions.DEVELOPER.getName());
-            logger.info("Developer permission created.");
+            logger.error("Developer permission does not exist. Please create it before proceeding.");
+            System.exit(1);
+            return;
         } else {
+            if (permissionService.getPermissionByName(WellKnownPermissions.DEVELOPER.getName()).isEmpty()) {
+                logger.error("Developer permission does not exist. Please create it before proceeding.");
+                System.exit(1);
+                return;
+            }
             developerPermission = permissionService.getPermissionByName(WellKnownPermissions.DEVELOPER.getName()).get();
-        }
-
-        final Optional<Permission> shsAdmin = permissionService.getPermissionByName(WellKnownPermissions.SHS_ADMIN.getName());
-
-        if (shsAdmin.isEmpty()) {
-            permissionService.createPermission(WellKnownPermissions.SHS_ADMIN.getName());
-            logger.info("SHS Admin permission created.");
         }
 
         final Optional<UserEntity> adminUser = userService.getAdminUser();
