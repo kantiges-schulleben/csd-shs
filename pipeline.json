@@ -3,8 +3,7 @@
     "pipeline": {
         "default": [
           "cd backend",
-          "mvn clean compile",
-          "mvn test"
+          "mvn clean test"
         ],
         "release": [
         ]
