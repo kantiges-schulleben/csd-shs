@@ -1,5 +1,5 @@
 {
-    "image": "docker.klnsdr.com/maven-21:0.3",
+    "image": "docker.klnsdr.com/maven-21:1.0",
     "pipeline": {
         "default": [
           "cd backend",
