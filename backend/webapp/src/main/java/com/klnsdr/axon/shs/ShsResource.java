@@ -23,13 +23,13 @@ public class ShsResource {
     // TODO validate
     @PostMapping("/enroll/student")
     public Student enrollStudent(@RequestBody StudentDTO student) {
-        return studentService.createStudent(StudentDTO.map(student));
+        return studentService.createStudent(student.toStudent());
     }
 
     // TODO validate
     @PostMapping("/enroll/teacher")
     public Teacher enrollTeacher(@RequestBody TeacherDTO teacher) {
-        return studentService.createTeacher(TeacherDTO.map(teacher));
+        return studentService.createTeacher(teacher.toTeacher());
     }
 
     @GetMapping("/end-date")

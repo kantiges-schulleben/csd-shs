@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -38,7 +37,7 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
      * The URL to redirect to after successful authentication.
      */
     @Value("${app.oauth2.successRedirectUrl}")
-    private String redirectUrl;
+    private String redirectUrl = "https://example.com/welcome";
 
     public OAuthHandler(JwtUtil jwtUtil, UserService userService, TokenService tokenService) {
         this.jwtUtil = jwtUtil;
@@ -78,7 +77,7 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
                 user = userService.createUser(idpID, name);
             }
 
-            final String token = jwtUtil.generateToken(oAuth2User, user, oAuthUserProviderWrapper);
+            final String token = jwtUtil.generateToken(user, oAuthUserProviderWrapper);
             final Date validTill = jwtUtil.extractExpiration(token);
 
             tokenService.save(token, validTill);
@@ -90,7 +89,7 @@ public class OAuthHandler implements AuthenticationSuccessHandler {
         }
     }
 
-    private OAuthUserToCommonUser getOAuthUserProviderWrapper(String authClient, OAuth2User oAuth2User) {
+    OAuthUserToCommonUser getOAuthUserProviderWrapper(String authClient, OAuth2User oAuth2User) {
         if ("github".equals(authClient)) {
             return new GithubUserToCommonUser(oAuth2User);
         } else if ("nextcloud".equals(authClient)) {

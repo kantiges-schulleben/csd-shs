@@ -44,7 +44,7 @@ public class ShsAdminResource {
     // TODO validate
     @PutMapping("/students/id/{studentId}")
     public EnrolledStudentEntity updateStudentDetails(@RequestBody StudentDTO studentEntity, @PathVariable("studentId") Long studentId) {
-        final Student student = StudentDTO.map(studentEntity);
+        final Student student = studentEntity.toStudent();
         student.setId(studentId);
         return studentService.update(student);
     }
@@ -52,7 +52,7 @@ public class ShsAdminResource {
     // TODO validate
     @PutMapping("/teachers/id/{teacherId}")
     public EnrolledStudentEntity updateTeacherDetails(@RequestBody TeacherDTO teacherEntity, @PathVariable("teacherId") Long teacherId) {
-        final Teacher teacher = TeacherDTO.map(teacherEntity);
+        final Teacher teacher = teacherEntity.toTeacher();
         teacher.setId(teacherId);
         return studentService.update(teacher);
     }

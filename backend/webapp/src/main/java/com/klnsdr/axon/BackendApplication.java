@@ -24,10 +24,12 @@ public class BackendApplication {
     private static final Logger logger = LoggerFactory.getLogger(BackendApplication.class);
     private final PermissionService permissionService;
     private final UserService userService;
+    private final ExitHandler exitHandler;
 
-    public BackendApplication(PermissionService permissionService, UserService userService) {
+    public BackendApplication(PermissionService permissionService, UserService userService, ExitHandler exitHandler) {
         this.permissionService = permissionService;
         this.userService = userService;
+        this.exitHandler = exitHandler;
     }
 
     public static void main(String[] args) {
@@ -39,12 +41,12 @@ public class BackendApplication {
         final Permission developerPermission;
         if (!permissionService.existsDevPermission()) {
             logger.error("Developer permission does not exist. Please create it before proceeding.");
-            System.exit(1);
+            exitHandler.exit(1);
             return;
         } else {
             if (permissionService.getPermissionByName(WellKnownPermissions.DEVELOPER.getName()).isEmpty()) {
                 logger.error("Developer permission does not exist. Please create it before proceeding.");
-                System.exit(1);
+                exitHandler.exit(1);
                 return;
             }
             developerPermission = permissionService.getPermissionByName(WellKnownPermissions.DEVELOPER.getName()).get();

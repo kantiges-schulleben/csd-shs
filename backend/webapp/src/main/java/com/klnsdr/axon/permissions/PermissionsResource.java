@@ -1,9 +1,7 @@
 package com.klnsdr.axon.permissions;
 
 import com.klnsdr.axon.permissions.entity.Permission;
-import com.klnsdr.axon.permissions.entity.UserPermissions;
 import com.klnsdr.axon.permissions.service.PermissionService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

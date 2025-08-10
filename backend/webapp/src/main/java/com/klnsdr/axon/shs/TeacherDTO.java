@@ -16,16 +16,16 @@ public class TeacherDTO {
     private String phoneNumber;
     private int targetGrade;
 
-    public static Teacher map(TeacherDTO teacherDTO) {
+    public Teacher toTeacher() {
         final Teacher teacher = new Teacher();
-        teacher.setName(teacherDTO.getName());
-        teacher.setSureName(teacherDTO.getSureName());
-        teacher.setMail(teacherDTO.getMail());
-        teacher.setSubject(teacherDTO.getSubject());
-        teacher.setGrade(teacherDTO.getGrade());
-        teacher.setGroup(teacherDTO.isGroup());
-        teacher.setPhoneNumber(teacherDTO.getPhoneNumber());
-        teacher.setTargetGrade(teacherDTO.getTargetGrade());
+        teacher.setName(this.getName());
+        teacher.setSureName(this.getSureName());
+        teacher.setMail(this.getMail());
+        teacher.setSubject(this.getSubject());
+        teacher.setGrade(this.getGrade());
+        teacher.setGroup(this.isGroup());
+        teacher.setPhoneNumber(this.getPhoneNumber());
+        teacher.setTargetGrade(this.getTargetGrade());
         return teacher;
     }
 }

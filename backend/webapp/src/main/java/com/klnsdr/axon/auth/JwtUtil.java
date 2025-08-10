@@ -9,7 +9,6 @@ import com.klnsdr.axon.auth.identityProvider.OAuthUserToCommonUser;
 import com.klnsdr.axon.user.entity.UserEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -31,7 +30,7 @@ public class JwtUtil {
      * @param oAuth2User the OAuth2 user
      * @return the generated JWT token
      */
-    public String generateToken(OAuth2User oAuth2User, UserEntity user, OAuthUserToCommonUser oAuthUserToCommonUser) {
+    public String generateToken(UserEntity user, OAuthUserToCommonUser oAuthUserToCommonUser) {
         return JWT.create()
                 .withSubject(oAuthUserToCommonUser.getId())
                 .withClaim("id", user.getId())

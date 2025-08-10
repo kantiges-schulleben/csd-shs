@@ -15,15 +15,15 @@ public class StudentDTO {
     private boolean isGroup;
     private String phoneNumber;
 
-    public static Student map(StudentDTO studentDTO) {
+    public Student toStudent() {
         final Student student = new Student();
-        student.setName(studentDTO.getName());
-        student.setSureName(studentDTO.getSureName());
-        student.setMail(studentDTO.getMail());
-        student.setSubject(studentDTO.getSubject());
-        student.setGrade(studentDTO.getGrade());
-        student.setGroup(studentDTO.isGroup());
-        student.setPhoneNumber(studentDTO.getPhoneNumber());
+        student.setName(this.getName());
+        student.setSureName(this.getSureName());
+        student.setMail(this.getMail());
+        student.setSubject(this.getSubject());
+        student.setGrade(this.getGrade());
+        student.setGroup(this.isGroup());
+        student.setPhoneNumber(this.getPhoneNumber());
         return student;
     }
 }
