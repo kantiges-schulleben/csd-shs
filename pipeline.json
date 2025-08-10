@@ -1,0 +1,10 @@
+{
+    "image": "docker.klnsdr.com/maven-21:0.1",
+    "pipeline": {
+        "default": [
+            "ls"
+        ],
+        "release": [
+        ]
+    }
+}
