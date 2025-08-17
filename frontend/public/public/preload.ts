@@ -35,7 +35,6 @@ function preload() {
                             <li class='active'><a href='/'>Startseite</a>
                             </li>
                             <li><a href='/shs/information'>Informationen</a></li>
-                            <li><a href='/shs/blog'>Aktuelles</a></li>
                             <li><a href='/shs/anmeldung'>Anmeldung</a></li>
                             <li id="liLnkKonto">
                                 <a id="lnkKonto">Konto</a>
