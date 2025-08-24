@@ -34,7 +34,6 @@ function preload() {
                         <ul class='nav-links'>
                             <li class='active'><a href='/'>Startseite</a>
                             </li>
-                            <li><a href='/shs/information'>Informationen</a></li>
                             <li><a href='/shs/anmeldung'>Anmeldung</a></li>
                             <li id="liLnkKonto">
                                 <a id="lnkKonto">Konto</a>
@@ -67,7 +66,7 @@ function preload() {
                         <li>
                             <div class="titleS">Socialmedia</div>
                             <div class="buttonsS">
-                                <a href="https://www.kantgym-leipzig.de"
+                                <a href="https://christophorusschulen-sachsen-anhalt.cjd.de/de/cjd-christophorusschulen-droyssig"
                                     >Webseite unserer Schule</a
                                 ><br />
                                 <a

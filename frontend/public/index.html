@@ -24,80 +24,135 @@
         <script src="/public/preload.js"></script>
         <script src="/public/jwt.js"></script>
         <script src="/public/constants.js"></script>
+        <script src="/sketch.js"></script>
         <title></title>
     </head>
 
-    <body onload="preload();">
+    <body onload="preload(); loadEndDate()">
         <nav id="navbar"></nav>
         <header>
-            <h1>Herzlich Willkommen</h1>
+            <h1>"Schüler helfen Schülern" - dein Engagement ist gefragt!</h1>
 
             <p>
-                Du befindest dich auf der Kantigen Schulleben Website des
-                Immanuel-Kant-Gymnasiums. <br />
-                Hier findest du alle wichtigen Informationen zu den Projekten
-                der Schüler*innen. Die Website funktioniert leider noch nicht
-                auf Handys. Wir sind dran!
+                „Schüler helfen Schülern“ ist ein Projekt, welches unseren
+                Schülerinnen und Schülern ermöglicht, sich gegenseitig zu
+                unterstützen und voneinander zu lernen. In Lernpatenschaften
+                agieren Schülerinnen und Schüler als Junior-Teacher und
+                unterstützen Jüngere oder kleine Gruppen in einzelnen Fächern
+                oder generell beim Lernen.
+            </p>
+            <p>
+                Die Lernpatenschaften finden dienstags in der 5. Stunde statt
+                oder werden individuell vereinbart. Auch Onlineunterricht ist
+                möglich. Du möchtest helfen oder du brauchst Hilfe, dann kannst
+                du dich über diese Website oder in der Lerninsel beim Projekt
+                ShS <a href="/shs/anmeldung">anmelden</a>.
             </p>
         </header>
-        <section>
-            <div class="cards">
-                <a href="/shs">
-                    <div class="col">
-                        <div class="card aqua">
-                            <h2>ShS</h2>
-                            <p>
-                                Nachhilfe von Schüler*innen für Schüler*innen,
-                                direkt vor Ort an unserer Schule oder digital
-                                von Zuhause.
-                            </p>
-                            <img src="/assets/Main/shs.png" alt="" />
-                        </div>
+        <section id="cards">
+            <h2>So kommst du zu deiner Lernpatenschaft</h2>
+            <br />
+            <div class="container">
+                <div class="card-item">
+                    <div class="card-info">
+                        <h3>Registrierung</h3>
+                        <p>
+                            Die Registrierung dient zur Sicherheit des
+                            Anmeldungsprozess für ShS. Dafür kannst du dich
+                            <a
+                                href="http://localhost:8080/oauth2/authorization/nextcloud"
+                                >hier</a
+                            >
+                            ganz einfach mit deinem Nextcloudaccount
+                            registrieren.
+                        </p>
                     </div>
-                </a>
-                <a href="/kantrat/aktuelles">
-                    <div class="col">
-                        <div class="card red">
-                            <h2>Kantrat</h2>
-                            <p>
-                                Wir lernen Demokratie. Wir nehmen Demokratie
-                                wahr. Wir leben Demokratie am KANT! Wir sind der
-                                Kantrat.
-                            </p>
-                            <img src="/assets/Main/rat.png" alt="" />
-                        </div>
+                    <div class="card-img">
+                        <img src="/assets/one.png" alt="img" class="test" />
                     </div>
-                </a>
-            </div>
-            <div class="cards">
-                <a href="/error">
-                    <div class="col">
-                        <div class="card orange">
-                            <h2>Projekte</h2>
-                            <p>
-                                Der Schulclub soll ein Ort sein, indem
-                                Schüler*innen zusammenkommen und ihre Freiräume
-                                gestalten.
-                            </p>
-                            <img src="/assets/Main/kant.png" alt="" />
-                        </div>
+                </div>
+                <div class="card-item">
+                    <div class="card-info">
+                        <h3>Anmeldung</h3>
+                        <p>
+                            Melde dich <a href="/shs/anmeldung">hier</a> in
+                            unserem Projekt für das aktuelle Schuljahr an, um
+                            Junior-Teacher zu werden. Sobald du dich bei uns
+                            angemeldet hast, werden deine Daten in unserer
+                            Datenbank gesichert. Keine Sorge, deine Daten sind
+                            dort geschützt! Mit Hilfe dieser Daten können wir
+                            dir eine(n) geeignete(n) Lernpatenschaftsschüler(in)
+                            zuteilen.<br />
+                            <b>Wichtig:</b> Möchtest du mehr als ein Fach
+                            unterrichten? Melde dich für jedes Fach separat an!
+                            <br />
+                            <b
+                                >Anmeldungsschluss ist der
+                                <label id="lblEnddate"></label
+                            ></b>
+                        </p>
                     </div>
-                </a>
-                <a href="/provokant/aktuelles">
-                    <div class="col">
-                        <div class="card blue">
-                            <h2>Provokant</h2>
-                            <p>
-                                Hier ist eure Schüler*innenzeitung Provokant.
-                                Offiziell sind wir nun auch ein Teil dieser ganz
-                                besonderen Website und immer für euch erreichbar
-                                :) Unsere Artikel werden jetzt auf dieser
-                                Website erscheinen.
-                            </p>
-                            <img src="/assets/Main/provo.jpg" alt="" />
-                        </div>
+                    <div class="card-img">
+                        <img src="/assets/two.png" alt="img" class="test" />
                     </div>
-                </a>
+                </div>
+                <div class="card-item">
+                    <div class="card-info">
+                        <h3>Bestätigungsemail</h3>
+                        <p>
+                            Wenn du dich erfolgreich bei uns registriert und
+                            angemeldet hast, erhältst du eine Bestätigungsmail.
+                            Mit dieser bestätigen wir dir, dass deine Daten
+                            erfolgreich in unserer Datenbank gespeichert wurden.
+                        </p>
+                    </div>
+                    <div class="card-img">
+                        <img src="/assets/three.png" alt="img" class="test" />
+                    </div>
+                </div>
+                <div class="card-item">
+                    <div class="card-info">
+                        <h3>Warten</h3>
+                        <p>
+                            Nach deiner Anmeldung musst du gegebenenfalls etwas
+                            warten. Um den
+                            <label id="lblEnddateTwo"></label>
+                            erhälst du von uns eine weitere Mail mit weiteren
+                            Informationen zu deiner neuen Lernpatenschaft.
+                        </p>
+                    </div>
+                    <div class="card-img">
+                        <img src="/assets/four.png" alt="img" class="test" />
+                    </div>
+                </div>
+                <div class="card-item">
+                    <div class="card-info">
+                        <h3>Lernpatenschaftsvertrag</h3>
+                        <p>
+                            Fülle mit deinem(deiner) Lernpatenschaftsschüler(in)
+                            den Lernpatenschaftsvertrag aus und lasst Eltern und
+                            Projektleiter unterschreiben. Gebt diesen Vertrag
+                            bei der Projektleitung persönlich ab. Der
+                            Junior-Teacher führt außerdem eine
+                            Lernpatenschaftskarte, in der sie/er die
+                            Lernpatenschaftsunterrichtsstunden dokumentiert. Die
+                            Bezahlung ist im Vertrag zwischen beiden Parteien
+                            geregelt. Bei Fragen steht euch unser ShS-Team zur
+                            Verfügung.
+                        </p>
+                    </div>
+                    <div class="card-img">
+                        <img src="/assets/five.png" alt="img" class="test" />
+                    </div>
+                </div>
+                <i>
+                    Klappt irgendetwas nicht, wollt ihr uns Feedback geben oder
+                    habt ihr andere Fragen? Dann schreibt uns hier über unseren
+                    Kontakt
+                    <a href="mailto:shs-cjd@gmx.de">shs-cjd@gmx.de</a> oder
+                    meldet euch Dienstags 5.Stunde bei der Projektleitung in der
+                    Lerninsel.
+                </i>
             </div>
         </section>
         <footer id="footer"></footer>
