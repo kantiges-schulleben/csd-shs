@@ -33,6 +33,10 @@ function renderPhase1Ui() {
                         tag: 'br',
                     },
                     {
+                        tag: 'lable',
+                        text: 'Einschreibungsende:',
+                    },
+                    {
                         tag: 'input',
                         type: 'date',
                         id: 'inputEndDate',
