@@ -15,6 +15,7 @@
         <module>menu</module>
         <module>shs</module>
         <module>permissions</module>
+        <module>mail</module>
     </modules>
 
     <dependencies>

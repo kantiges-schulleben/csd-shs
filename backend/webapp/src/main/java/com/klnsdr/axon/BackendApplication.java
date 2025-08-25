@@ -14,12 +14,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Optional;
 
 @SpringBootApplication
 @OpenAPIDefinition(info = @Info(title = "axon api documentation", version = "v1"))
 @EnableAsync
+@EnableScheduling
 public class BackendApplication {
     private static final Logger logger = LoggerFactory.getLogger(BackendApplication.class);
     private final PermissionService permissionService;

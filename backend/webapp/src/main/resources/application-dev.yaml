@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host:
+    port:
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   application:
     name: webapp
   datasource:
@@ -44,7 +55,7 @@ server:
   port: 8080
 app:
   oauth2:
-    successRedirectUrl: https://localhost:3000
+    successRedirectUrl:
     failRedirectUrl: http://localhost:3000/login?error=true
   frontend:
     url: http://localhost:3000

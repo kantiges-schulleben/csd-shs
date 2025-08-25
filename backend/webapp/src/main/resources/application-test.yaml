@@ -1,4 +1,14 @@
 spring:
+  mail:
+    host: smtp.mail.com
+    port: 587
+    username: username
+    password: password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls: true
   application:
     name: webapp
   datasource:

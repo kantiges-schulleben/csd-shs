@@ -2,9 +2,15 @@ package com.klnsdr.axon.shs.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.klnsdr.axon.shs.entity.*;
-import com.klnsdr.axon.shs.entity.analysis.AnalysisConfig;
+import com.klnsdr.axon.mail.Mail;
+import com.klnsdr.axon.mail.service.MailService;
+import com.klnsdr.axon.shs.entity.EnrolledStudentEntity;
+import com.klnsdr.axon.shs.entity.LockedEnrolledStudentEntity;
+import com.klnsdr.axon.shs.entity.Student;
+import com.klnsdr.axon.shs.entity.Teacher;
 import com.klnsdr.axon.shs.entity.analysis.legacy.Group;
+import com.klnsdr.axon.shs.mail.ShsMailRenderer;
+import com.klnsdr.axon.shs.mail.ShsMailStore;
 import com.klnsdr.axon.shs.service.legacy.GroupService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +30,10 @@ public class StudentService {
     private final AnalysisConfigService analysisConfigService;
     private final GroupService groupService;
     private final AnalysisScriptRunner analysisScriptRunner;
+    private final MailService mailService;
+    private final ShsMailStore shsMailStore;
+    private final ShsMailRenderer shsMailRenderer;
+    private final AtomicBoolean running = new AtomicBoolean(false);
 
     public StudentService(
             StudentRepository studentRepository,
@@ -31,7 +41,10 @@ public class StudentService {
             CopyStudentDataHelper copyStudentDataHelper,
             GroupService groupService,
             AnalysisConfigService analysisConfigService,
-            AnalysisScriptRunner analysisScriptRunner
+            AnalysisScriptRunner analysisScriptRunner,
+            MailService mailService,
+            ShsMailStore shsMailStore,
+            ShsMailRenderer shsMailRenderer
 
     ) {
         this.studentRepository = studentRepository;
@@ -40,16 +53,34 @@ public class StudentService {
         this.groupService = groupService;
         this.analysisConfigService = analysisConfigService;
         this.analysisScriptRunner = analysisScriptRunner;
+        this.mailService = mailService;
+        this.shsMailStore = shsMailStore;
+        this.shsMailRenderer = shsMailRenderer;
     }
 
     public Teacher createTeacher(Teacher teacher) {
         final EnrolledStudentEntity entity = map(teacher);
-        return mapToTeacher(studentRepository.save(entity));
+        final Teacher enrolledTeacher = mapToTeacher(studentRepository.save(entity));
+        sendConfirmationMail(enrolledTeacher);
+        return enrolledTeacher;
     }
 
     public Student createStudent(Student student) {
         final EnrolledStudentEntity entity = map(student);
-        return mapToStudent(studentRepository.save(entity));
+        final Student enrolledStudent = mapToStudent(studentRepository.save(entity));
+        sendConfirmationMail(enrolledStudent);
+        return enrolledStudent;
+    }
+
+    private void sendConfirmationMail(Student enrolled) {
+        final Mail confirmationMail = shsMailStore.getConfirmationMailTemplate();
+        confirmationMail.setTo(enrolled.getMail());
+        mailService.sendEmail(shsMailRenderer.renderMail(
+                confirmationMail,
+                Map.of(
+                        "NAME", enrolled.getName() + " " + enrolled.getSureName()
+                )
+        ));
     }
 
     public long getEnrolledStudentCount() {
@@ -108,7 +139,40 @@ public class StudentService {
         final Group existingGroup = group.get();
         existingGroup.setReleased(true);
         groupService.save(existingGroup);
+        sendGroupConfirmationMails(existingGroup);
         return true;
+    }
+
+    public void sendGroupConfirmationMails(Group group) {
+        final Mail mailTeacher = shsMailStore.getPairTeacherMailTemplate();
+        mailTeacher.setTo(group.getTeacher().getMail());
+        mailService.sendEmail(shsMailRenderer.renderMail(
+                mailTeacher,
+                Map.of(
+                        "NAME", group.getTeacher().getName() + " " + group.getTeacher().getSureName(),
+                        "NAME_STUDENT", group.getStudents().stream().map(s -> s.getName() + " " + s.getSureName()).reduce((a, b) -> a + ", " + b).orElse(""),
+                        "GRADE", Integer.toString(group.getTeacher().getGrade()),
+                        "SUBJECT", group.getSubject(),
+                        "MAIL", group.getStudents().stream().map(LockedEnrolledStudentEntity::getMail).reduce((a, b) -> a + ", " + b).orElse(""),
+                        "TELEPHONE", group.getStudents().stream().map(LockedEnrolledStudentEntity::getPhoneNumber).reduce((a, b) -> a + ", " + b).orElse("")
+                )
+        ));
+
+        for (LockedEnrolledStudentEntity student : group.getStudents()) {
+            final Mail mailStudent = shsMailStore.getPairStudentMailTemplate();
+            mailStudent.setTo(student.getMail());
+            mailService.sendEmail(shsMailRenderer.renderMail(
+                    mailStudent,
+                    Map.of(
+                            "NAME", student.getName() + " " + student.getSureName(),
+                            "NAME_TEACHER", group.getTeacher().getName() + " " + group.getTeacher().getSureName(),
+                            "GRADE", Integer.toString(group.getTeacher().getGrade()),
+                            "SUBJECT", group.getSubject(),
+                            "MAIL", group.getTeacher().getMail(),
+                            "TELEPHONE", group.getTeacher().getPhoneNumber()
+                    )
+            ));
+        }
     }
 
     public boolean deleteGroup(Long id) {
@@ -170,8 +234,6 @@ public class StudentService {
         }
         return true;
     }
-
-    private final AtomicBoolean running = new AtomicBoolean(false);
 
     @Async
     public void runAnalysis() {
@@ -313,24 +375,21 @@ public class StudentService {
     }
 
     private void parseAndStoreScriptOutput(String output) throws JsonProcessingException {
-        @SuppressWarnings("unchecked")
-        final HashMap<String, Object> resultMap = new ObjectMapper().readValue(output, HashMap.class);
+        @SuppressWarnings("unchecked") final HashMap<String, Object> resultMap = new ObjectMapper().readValue(output, HashMap.class);
 
         if (!(
                 resultMap.containsKey("einzel") &&
-                resultMap.containsKey("gruppe") &&
-                resultMap.containsKey("ohne") &&
-                resultMap.get("einzel") instanceof List &&
-                resultMap.get("gruppe") instanceof List &&
-                resultMap.get("ohne") instanceof List
+                        resultMap.containsKey("gruppe") &&
+                        resultMap.containsKey("ohne") &&
+                        resultMap.get("einzel") instanceof List &&
+                        resultMap.get("gruppe") instanceof List &&
+                        resultMap.get("ohne") instanceof List
         )) {
             logger.error("Script output does not contain expected keys: {}", resultMap.keySet());
             throw new IllegalArgumentException("Invalid script output format");
         }
-        @SuppressWarnings("unchecked")
-        final List<Map<String, Object>> single = (List<Map<String, Object>>) resultMap.get("einzel");
-        @SuppressWarnings("unchecked")
-        final List<Map<String, Object>> group = (List<Map<String, Object>>) resultMap.get("gruppe");
+        @SuppressWarnings("unchecked") final List<Map<String, Object>> single = (List<Map<String, Object>>) resultMap.get("einzel");
+        @SuppressWarnings("unchecked") final List<Map<String, Object>> group = (List<Map<String, Object>>) resultMap.get("gruppe");
 
         doSingle(single);
         doGroup(group);
@@ -344,7 +403,7 @@ public class StudentService {
             group.setReleased(false);
             group.setTeacher(lockedStudentRepository.findById(Long.parseLong((String) pair.get("accountID")))
                     .orElseThrow(() -> new IllegalArgumentException("Teacher not found for ID: " + pair.get("accountID"))));
-            final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String)((Map<String, Object>) pair.get("partner")).get("accountID")))
+            final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String) ((Map<String, Object>) pair.get("partner")).get("accountID")))
                     .orElseThrow(() -> new IllegalArgumentException("Student not found for ID: " + pair.get("accountID")));
             group.setStudents(List.of(student));
 
@@ -366,7 +425,7 @@ public class StudentService {
 
             final Map<String, Object> studentData = (Map<String, Object>) pair.get("partner");
             for (int i = 1; i <= studentCount; i++) {
-                final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String)((Map<String, Object>) studentData.get(Integer.toString(i))).get("accountID")))
+                final LockedEnrolledStudentEntity student = lockedStudentRepository.findById(Long.parseLong((String) ((Map<String, Object>) studentData.get(Integer.toString(i))).get("accountID")))
                         .orElseThrow(() -> new IllegalArgumentException("Student not found for ID: " + studentData.get("accountID")));
                 students.add(student);
             }

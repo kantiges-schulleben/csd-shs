@@ -27,6 +27,10 @@ services:
       APP_OAUTH2_FAIL_REDIRECT_URL:
       APP_FRONTEND_URL:
       APP_AUTH_JWT_SECRET:
+      MAIL_HOST:
+      MAIL_PORT:
+      MAIL_USERNAME:
+      MAIL_PASSWORD:
     networks:
       - csd_net
   csd_database:
