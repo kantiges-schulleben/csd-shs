@@ -8,7 +8,8 @@ spring:
       mail:
         smtp:
           auth: true
-          starttls: true
+          starttls:
+            enable: true
   application:
     name: webapp
   datasource:
